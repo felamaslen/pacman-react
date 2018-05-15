@@ -11,7 +11,7 @@ export default function Walls(props) {
     };
 
     const linesWalls = Object.keys(walls).map(key => {
-        const parts = walls[key].parts.map(([distance, direction]) => ({ distance, direction }));
+        const parts = walls[key].parts.map(([distance, direction, radius]) => ({ distance, direction, radius }));
 
         return (
             <Line key={key} {...props} {...lineProps}

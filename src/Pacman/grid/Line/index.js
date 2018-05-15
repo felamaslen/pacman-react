@@ -8,33 +8,36 @@ function getCornerArc(cornerArcRadius, clockwise, diffX, diffY) {
 
 const pmod = (num, base) => ((num % base) + base) % base;
 
-function getLinePart({ cornerArcRadius, path, lastDirection, distance, direction, index, end }) {
+function getLinePart({ radiusA, radiusB, path, lastDirection, distance, direction, index, end }) {
     const vertical = direction % 2;
     const horizontal = 1 - vertical;
 
     const reverse = (-1) ** ((direction < 2) >> 0);
     const polarity = (-1) ** vertical;
+
+    const vectorType = ['h', 'v'][vertical];
+
     if (index === 0) {
-        const vector = (cornerArcRadius - distance) * reverse * polarity;
-        const line = `h${vector}`;
+        const vector = (radiusB - distance) * reverse * polarity;
+        const line = `${vectorType}${vector}`;
 
         return `${path} ${line}`;
     }
 
-    const vector = (cornerArcRadius * 2 * (!end >> 0) - distance) * reverse * polarity;
-    const line = `${['h', 'v'][vertical]}${vector}`;
+    const vector = (radiusA + radiusB * (!end >> 0) - distance) * reverse * polarity;
+    const line = `${vectorType}${vector}`;
 
-    const cornerArcDiffX = cornerArcRadius * (
+    const cornerArcDiffX = radiusA * (
         (-1) ** ((lastDirection === constants.DIRECTION_WEST) >> 0) * vertical - reverse * horizontal
     );
 
-    const cornerArcDiffY = cornerArcRadius * (
+    const cornerArcDiffY = radiusA * (
         (-1) ** ((lastDirection === constants.DIRECTION_NORTH) >> 0) * horizontal + reverse * vertical
     );
 
     const clockwise = (pmod(lastDirection - direction, 4) === 1) >> 0;
 
-    const cornerArc = getCornerArc(cornerArcRadius, clockwise, cornerArcDiffX, cornerArcDiffY);
+    const cornerArc = getCornerArc(radiusA, clockwise, cornerArcDiffX, cornerArcDiffY);
 
     return `${path} ${cornerArc} ${line}`;
 }
@@ -46,15 +49,16 @@ function getPoint([xValue, yValue], gridSize) {
 export default function Line({ gridSize, start, parts, ...props }) {
     const startTransformed = getPoint(start, gridSize);
 
-    const cornerArcRadius = gridSize / 2;
+    const partRadius = parts.map(({ radius }) => gridSize / (radius || 3));
 
     const { path: pathString } = parts.map(({ distance, ...rest }) => ({
         distance: distance * gridSize,
         ...rest
     }))
-        .reduce(({ path, lastDirection }, { distance, direction }, index) => ({
+        .reduce(({ path, lastDirection, lastRadius }, { distance, direction }, index) => ({
             path: getLinePart({
-                cornerArcRadius,
+                radiusA: lastRadius,
+                radiusB: partRadius[index],
                 path,
                 lastDirection,
                 distance,
@@ -62,7 +66,8 @@ export default function Line({ gridSize, start, parts, ...props }) {
                 index,
                 end: index === parts.length - 1
             }),
-            lastDirection: direction
+            lastDirection: direction,
+            lastRadius: partRadius[index]
         }), {
             path: `M${startTransformed.join(',')}`
         });
