@@ -1,16 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { BOARD_HEIGHT } from '../constants';
+import { cssPosition } from '../helpers';
 import './style.scss';
 
 export default function Food({ gridSize, position, eaten, big }) {
     const className = classNames('food', { eaten, big });
 
-    const style = {
-        left: (position[0] + 1.5) * gridSize,
-        top: (BOARD_HEIGHT - position[1] - 3) * gridSize
-    };
+    const style = cssPosition(position, gridSize);
 
     return (
         <span className={className} style={style} />
