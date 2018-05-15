@@ -3,25 +3,26 @@ function isBigFood([posX, posY]) {
 }
 
 function generateFood() {
-    const genRow = (posY, startX, num) => new Array(num).fill(0)
-        .map((item, index) => ([startX + index, 0]));
+    const genRow = (startX, posY, num) => new Array(num).fill(0)
+        .map((item, index) => ([startX + index, posY]));
 
     return [
-        ...genRow(0, 0, 25),
+        ...genRow(0, 0, 26),
         [0, 1],
-        [12, 1],
-        [15, 1],
+        [11, 1],
+        [14, 1],
         [25, 1],
         [0, 2],
-        [12, 2],
-        [15, 2],
+        [11, 2],
+        [14, 2],
         [25, 2],
-        ...genRow(3, 0, 6),
-        ...genRow(3, 8, 4),
-        ...genRow(3, 14, 4),
-        ...genRow(3, 20, 6)
+        ...genRow(0, 3, 6),
+        ...genRow(8, 3, 4),
+        ...genRow(14, 3, 4),
+        ...genRow(20, 3, 6)
     ]
-        .map(position => ({
+        .map((position, index) => ({
+            key: index,
             position,
             eaten: false,
             big: isBigFood(position)

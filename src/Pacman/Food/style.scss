@@ -1,0 +1,14 @@
+.food {
+    display: block;
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 100%;
+    background: yellow;
+
+    &.big {
+        width: 10px;
+        height: 10px;
+    }
+}
+

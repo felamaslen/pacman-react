@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { BOARD_WIDTH, BOARD_HEIGHT } from '../constants';
 import Walls from './Walls';
+import './style.scss';
 
 export default function Board(props) {
     const { gridSize } = props;
