@@ -1,15 +1,10 @@
 import React from 'react';
 import { render } from 'react-dom';
+import Pacman from './Pacman';
 
-import './main.scss';
+const props = {
+    gridSize: 12
+};
 
-function App() {
-    return (
-        <div>
-            <span>{'React works'}</span>
-        </div>
-    );
-}
-
-render(<App />, document.getElementById('root'));
+render(<Pacman {...props} />, document.getElementById('root'));
 
