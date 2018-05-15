@@ -1,25 +1,43 @@
 function isBigFood([posX, posY]) {
-    return (posX === 0 || posX === 25) && (posY === 7 || posY === 27);
+    return (posX === 0 || posX === 25) && (posY === 6 || posY === 26);
 }
 
 function generateFood() {
     const genRow = (startX, posY, num) => new Array(num).fill(0)
         .map((item, index) => ([startX + index, posY]));
 
+    const genDisparateRow = (xPoints, posY) => xPoints
+        .map(posX => ([posX, posY]));
+
+    const genContinuousRow = (ranges, posY) => ranges
+        .reduce((items, [startX, num]) => ([
+            ...items, ...genRow(startX, posY, num)
+        ]), []);
+
+    const genCol = (posX, startY, num) => new Array(num).fill(0)
+        .map((item, index) => ([posX, startY + index]));
+
     return [
         ...genRow(0, 0, 26),
-        [0, 1],
-        [11, 1],
-        [14, 1],
-        [25, 1],
-        [0, 2],
-        [11, 2],
-        [14, 2],
-        [25, 2],
-        ...genRow(0, 3, 6),
-        ...genRow(8, 3, 4),
-        ...genRow(14, 3, 4),
-        ...genRow(20, 3, 6)
+        ...genDisparateRow([0, 11, 14, 25], 1),
+        ...genDisparateRow([0, 11, 14, 25], 2),
+        ...genContinuousRow([[0, 6], [8, 4], [14, 4], [20, 6]], 3),
+        ...genDisparateRow([2, 5, 8, 17, 20, 23], 4),
+        ...genDisparateRow([2, 5, 8, 17, 20, 23], 5),
+        ...genContinuousRow([[0, 3], [5, 7], [14, 7], [23, 3]], 6),
+        ...genDisparateRow([0, 5, 11, 14, 20, 25], 7),
+        ...genDisparateRow([0, 5, 11, 14, 20, 25], 8),
+        ...genContinuousRow([[0, 12], [14, 12]], 9),
+        ...genCol(5, 10, 11),
+        ...genCol(20, 10, 11),
+        ...genContinuousRow([[0, 6], [8, 4], [14, 4], [20, 6]], 21),
+        ...genDisparateRow([0, 5, 8, 17, 20, 25], 22),
+        ...genDisparateRow([0, 5, 8, 17, 20, 25], 23),
+        ...genRow(0, 24, 26),
+        ...genDisparateRow([0, 5, 11, 14, 20, 25], 25),
+        ...genDisparateRow([0, 5, 11, 14, 20, 25], 26),
+        ...genDisparateRow([0, 5, 11, 14, 20, 25], 27),
+        ...genContinuousRow([[0, 12], [14, 12]], 28)
     ]
         .map((position, index) => ({
             key: index,
