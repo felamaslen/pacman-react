@@ -51,6 +51,7 @@ function generateFood() {
 
 export default function getInitialState() {
     return {
+        stepTime: Date.now(),
         player: {
             position: [12.5, 6],
             direction: DIRECTION_EAST,

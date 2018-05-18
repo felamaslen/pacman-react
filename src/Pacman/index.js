@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import getInitialState from './state';
+import { animate } from './game';
 import Board from './Board';
 import AllFood from './AllFood';
 import Monster from './Monster';
@@ -12,6 +13,21 @@ export default class Pacman extends Component {
         super(props);
 
         this.state = getInitialState();
+
+        this.onSpace = evt => {
+            if (evt.code === 'Space') {
+                this.step();
+            }
+        };
+    }
+    componentDidMount() {
+        window.addEventListener('keydown', this.onSpace);
+    }
+    componentWillUnmount() {
+        window.removeEventListener('keydown', this.onSpace);
+    }
+    step() {
+        this.setState(animate(this.state));
     }
     render() {
         const monsters = this.state.monsters.map(({ id, ...monster }) => (
