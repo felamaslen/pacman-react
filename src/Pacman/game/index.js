@@ -1,27 +1,22 @@
 import { EAST, NORTH, WEST, SOUTH } from '../constants';
+import { orderPolarityHorizontal } from '../helpers';
 import * as tracks from './tracks';
 
 const PLAYER_SPEED = 1; // dots per second
 
-function getEatenFoodEast(food, oldPosition, newPosition) {
+function getEatenFoodHorizontal(direction, food, oldPosition, newPosition) {
     const [posXA, posYA] = oldPosition;
     const [posXB] = newPosition;
 
-    return food.findIndex(({ position: [posX, posY], eaten }) => !eaten &&
-        posY === posYA && posX >= posXA && posX <= posXB);
-}
-function getEatenFoodWest(food, oldPosition, newPosition) {
-    const [posXA, posYA] = oldPosition;
-    const [posXB] = newPosition;
+    const { polarity } = orderPolarityHorizontal(direction);
 
     return food.findIndex(({ position: [posX, posY], eaten }) => !eaten &&
-        posY === posYA && posX <= posXA && posX >= posXB);
+        posY === posYA &&
+        polarity * posX <= polarity * posXA &&
+        polarity * posX >= polarity * posXB);
 }
 
-export function hitWallHorizontal(track, direction, oldPosX, newPosX) {
-    const order = (direction < 2) >> 0; // east -> 1, west -> 0
-    const polarity = (-1) ** order; // east -> -1, west -> 1
-
+export function hitWallHorizontal(track, { order, polarity }, oldPosX, newPosX) {
     const trackHit = track.findIndex(col =>
         oldPosX >= col[0] && oldPosX <= col[1] && polarity * newPosX < polarity * col[order]);
 
@@ -37,21 +32,14 @@ export function hitWallHorizontal(track, direction, oldPosX, newPosX) {
     return track[trackHit][order];
 }
 
-function getNewPositionEast(player, time) {
+function getNewPositionHorizontal(direction, player, time) {
     const newPosY = Math.floor(player.position[1]);
-
     const track = tracks.rows[newPosY];
 
-    const newPosX = hitWallHorizontal(track, EAST, player.position[0], player.position[0] + PLAYER_SPEED * time);
+    const { order, polarity } = orderPolarityHorizontal(direction);
 
-    return [newPosX, newPosY];
-}
-function getNewPositionWest(player, time) {
-    const newPosY = Math.floor(player.position[1]);
-
-    const track = tracks.rows[newPosY];
-
-    const newPosX = hitWallHorizontal(track, WEST, player.position[0], player.position[0] - PLAYER_SPEED * time);
+    const newPosX = hitWallHorizontal(track, { order, polarity }, player.position[0],
+        player.position[0] - polarity * PLAYER_SPEED * time);
 
     return [newPosX, newPosY];
 }
@@ -63,29 +51,10 @@ function animatePlayer(state, time) {
     const horizontal = direction % 2 === 0;
     const vertical = !horizontal;
 
-    if (direction === EAST) {
-        const newPosition = getNewPositionEast(player, time);
+    if (horizontal) {
+        const newPosition = getNewPositionHorizontal(direction, player, time);
 
-        const eatenFoodIndex = getEatenFoodEast(state.food, player.position, newPosition);
-
-        const food = state.food.slice();
-        if (eatenFoodIndex > -1) {
-            food[eatenFoodIndex].eaten = true;
-        }
-
-        return {
-            ...state,
-            player: {
-                ...player,
-                position: newPosition
-            },
-            food
-        };
-    }
-    if (direction === WEST) {
-        const newPosition = getNewPositionWest(player, time);
-
-        const eatenFoodIndex = getEatenFoodWest(state.food, player.position, newPosition);
+        const eatenFoodIndex = getEatenFoodHorizontal(direction, state.food, player.position, newPosition);
 
         const food = state.food.slice();
         if (eatenFoodIndex > -1) {
