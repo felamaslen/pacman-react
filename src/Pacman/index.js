@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DIRECTION_EAST, DIRECTION_NORTH, DIRECTION_WEST, DIRECTION_SOUTH } from './constants';
+import { EAST, NORTH, WEST, SOUTH } from './constants';
 import getInitialState from './state';
 import { animate, changeDirection } from './game';
 import Board from './Board';
@@ -20,16 +20,16 @@ export default class Pacman extends Component {
                 return this.step();
             }
             if (evt.key === 'ArrowRight') {
-                return this.changeDirection(DIRECTION_EAST);
+                return this.changeDirection(EAST);
             }
             if (evt.key === 'ArrowUp') {
-                return this.changeDirection(DIRECTION_NORTH);
+                return this.changeDirection(NORTH);
             }
             if (evt.key === 'ArrowLeft') {
-                return this.changeDirection(DIRECTION_WEST);
+                return this.changeDirection(WEST);
             }
             if (evt.key === 'ArrowDown') {
-                return this.changeDirection(DIRECTION_SOUTH);
+                return this.changeDirection(SOUTH);
             }
 
             return null;

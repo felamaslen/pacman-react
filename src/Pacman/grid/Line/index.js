@@ -28,11 +28,11 @@ function getLinePart({ radiusA, radiusB, path, lastDirection, distance, directio
     const line = `${vectorType}${vector}`;
 
     const cornerArcDiffX = radiusA * (
-        (-1) ** ((lastDirection === constants.DIRECTION_WEST) >> 0) * vertical - reverse * horizontal
+        (-1) ** ((lastDirection === constants.WEST) >> 0) * vertical - reverse * horizontal
     );
 
     const cornerArcDiffY = radiusA * (
-        (-1) ** ((lastDirection === constants.DIRECTION_NORTH) >> 0) * horizontal + reverse * vertical
+        (-1) ** ((lastDirection === constants.NORTH) >> 0) * horizontal + reverse * vertical
     );
 
     const clockwise = (pmod(lastDirection - direction, 4) === 1) >> 0;

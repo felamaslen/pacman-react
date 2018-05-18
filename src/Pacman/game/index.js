@@ -1,4 +1,4 @@
-import { DIRECTION_EAST, DIRECTION_NORTH, DIRECTION_WEST, DIRECTION_SOUTH } from '../constants';
+import { EAST, NORTH, WEST, SOUTH } from '../constants';
 import * as tracks from './tracks';
 
 const PLAYER_SPEED = 1; // dots per second
@@ -42,7 +42,7 @@ function getNewPositionEast(player, time) {
 
     const track = tracks.rows[newPosY];
 
-    const newPosX = hitWallHorizontal(track, DIRECTION_EAST, player.position[0], player.position[0] + PLAYER_SPEED * time);
+    const newPosX = hitWallHorizontal(track, EAST, player.position[0], player.position[0] + PLAYER_SPEED * time);
 
     return [newPosX, newPosY];
 }
@@ -51,7 +51,7 @@ function getNewPositionWest(player, time) {
 
     const track = tracks.rows[newPosY];
 
-    const newPosX = hitWallHorizontal(track, DIRECTION_WEST, player.position[0], player.position[0] - PLAYER_SPEED * time);
+    const newPosX = hitWallHorizontal(track, WEST, player.position[0], player.position[0] - PLAYER_SPEED * time);
 
     return [newPosX, newPosY];
 }
@@ -63,7 +63,7 @@ function animatePlayer(state, time) {
     const horizontal = direction % 2 === 0;
     const vertical = !horizontal;
 
-    if (direction === DIRECTION_EAST) {
+    if (direction === EAST) {
         const newPosition = getNewPositionEast(player, time);
 
         const eatenFoodIndex = getEatenFoodEast(state.food, player.position, newPosition);
@@ -82,7 +82,7 @@ function animatePlayer(state, time) {
             food
         };
     }
-    if (direction === DIRECTION_WEST) {
+    if (direction === WEST) {
         const newPosition = getNewPositionWest(player, time);
 
         const eatenFoodIndex = getEatenFoodWest(state.food, player.position, newPosition);
