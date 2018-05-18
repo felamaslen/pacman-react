@@ -53,6 +53,27 @@ export default function getInitialState() {
             position: [12.5, 6],
             lives: 3
         },
+        monsters: [
+            {
+                id: 'monster-cyan',
+                live: true,
+                color: 'cyan',
+                position: [10.5, 15]
+            },
+            {
+                id: 'monster-red',
+                live: true,
+                color: 'red',
+                position: [12.5, 15]
+            },
+            {
+                id: 'monster-pink',
+                live: true,
+                color: 'pink',
+                position: [14.5, 15]
+            }
+
+        ],
         food: generateFood()
     };
 }
