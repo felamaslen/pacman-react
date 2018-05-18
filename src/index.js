@@ -7,5 +7,14 @@ const props = {
     animate: process.env.NODE_ENV !== 'development'
 };
 
-render(<Pacman {...props} />, document.getElementById('root'));
+function renderApp(PacmanApp = Pacman) {
+    render(<PacmanApp {...props} />, document.getElementById('root'));
+}
+
+renderApp();
+
+if (module.hot) {
+    // eslint-disable-next-line global-require
+    module.hot.accept('./Pacman', () => renderApp(require('./Pacman').default));
+}
 

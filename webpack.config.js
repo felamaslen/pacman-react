@@ -2,7 +2,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const __DEV__ = process.env.NODE_ENV === 'development';
-const __PROD__ = process.env.NODE_ENV === 'production';
 
 function sassLoader() {
     const common = ['css-loader', 'sass-loader'];
@@ -35,7 +34,22 @@ function getPlugins() {
     ];
 }
 
+function getEntry() {
+    const common = ['./src/index.js'];
+
+    if (__DEV__) {
+        return [
+            'react-hot-loader/patch',
+            ...common
+        ];
+    }
+
+    return common;
+}
+
 module.exports = {
+    entry: getEntry(),
+    devtool: 'cheap-module-eval-source-map',
     module: {
         rules: [
             {
