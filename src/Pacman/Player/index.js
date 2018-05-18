@@ -41,11 +41,13 @@ export default class Player extends Component {
         this.timer = null;
     }
     componentDidMount() {
-        this.timer = setInterval(() => {
-            this.setState({
-                angle: 1 + 0.5 * Math.sin((Date.now() - this.startTime) / 50)
-            });
-        }, 30);
+        if (this.props.animate) {
+            this.timer = setInterval(() => {
+                this.setState({
+                    angle: 1 + 0.5 * Math.sin((Date.now() - this.startTime) / 50)
+                });
+            }, 30);
+        }
     }
     componentWillUnmount() {
         clearInterval(this.timer);
@@ -77,6 +79,7 @@ export default class Player extends Component {
 }
 
 Player.propTypes = {
+    animate: PropTypes.bool,
     gridSize: PropTypes.number.isRequired,
     position: PropTypes.array.isRequired
 };

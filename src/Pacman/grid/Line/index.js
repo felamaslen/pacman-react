@@ -72,12 +72,21 @@ export default function Line({ gridSize, start, parts, ...props }) {
             path: `M${startTransformed.join(',')}`
         });
 
+    const pathProps = {
+        strokeWidth: props.strokeWidth,
+        stroke: props.stroke,
+        fill: props.fill
+    };
+
     return (
-        <path d={pathString} {...props} />
+        <path d={pathString} {...pathProps} />
     );
 }
 
 Line.propTypes = {
+    strokeWidth: PropTypes.number,
+    stroke: PropTypes.string,
+    fill: PropTypes.string,
     gridSize: PropTypes.number.isRequired,
     start: PropTypes.array.isRequired,
     parts: PropTypes.array.isRequired
