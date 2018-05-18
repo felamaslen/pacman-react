@@ -3,23 +3,45 @@ import { DIRECTION_EAST, DIRECTION_NORTH, DIRECTION_WEST, DIRECTION_SOUTH } from
 
 const PLAYER_SPEED = 1; // dots per second
 
-function animatePlayer(player, time) {
+function getEatenFoodEast(food, oldPosition, newPosition) {
+    const [posXA, posYA] = oldPosition;
+    const [posXB] = newPosition;
+
+    return food.findIndex(({ position: [posX, posY], eaten }) => !eaten &&
+        posY === posYA && posX >= posXA && posX <= posXB);
+}
+
+function animatePlayer(state, time) {
+    const { player } = state;
+
     const direction = player.direction;
     const horizontal = direction % 2 === 0;
     const vertical = !horizontal;
 
     if (direction === DIRECTION_EAST) {
-        const posY = Math.floor(player.position[1]);
+        const newPosition = [
+            player.position[0] + PLAYER_SPEED * time,
+            Math.floor(player.position[1])
+        ];
 
-        const posX = player.position[0] + PLAYER_SPEED * time;
+        const eatenFoodIndex = getEatenFoodEast(state.food, player.position, newPosition);
+
+        const food = state.food.slice();
+        if (eatenFoodIndex > -1) {
+            food[eatenFoodIndex].eaten = true;
+        }
 
         return {
-            ...player,
-            position: [posX, posY]
+            ...state,
+            player: {
+                ...player,
+                position: newPosition
+            },
+            food
         };
     }
 
-    return player;
+    return state;
 }
 
 export function animate(state, { time = Date.now() } = {}) {
@@ -27,10 +49,8 @@ export function animate(state, { time = Date.now() } = {}) {
 
     const timeSeconds = (time - state.stepTime) / 1000;
 
-    return {
-        ...state,
-        stepTime: time,
-        player: animatePlayer(state.player, timeSeconds)
-    };
+    const statePlayerAnimated = animatePlayer({ ...state, stepTime: time }, timeSeconds);
+
+    return statePlayerAnimated;
 }
 
