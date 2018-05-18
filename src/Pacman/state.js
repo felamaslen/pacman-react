@@ -55,6 +55,7 @@ export default function getInitialState() {
         player: {
             position: [12.5, 6],
             direction: EAST,
+            nextDirection: EAST,
             lives: 3
         },
         monsters: [
