@@ -18,35 +18,23 @@ function getEatenFoodWest(food, oldPosition, newPosition) {
         posY === posYA && posX <= posXA && posX >= posXB);
 }
 
-export function hitWallEast(track, oldPosX, newPosX) {
-    const trackHit = track.findIndex(([colA, colB]) =>
-        oldPosX >= colA && oldPosX <= colB && newPosX > colB);
+export function hitWallHorizontal(track, direction, oldPosX, newPosX) {
+    const order = (direction < 2) >> 0; // east -> 1, west -> 0
+    const polarity = (-1) ** order; // east -> -1, west -> 1
 
-    if (trackHit === track.length - 1 && track[trackHit][2]) {
+    const trackHit = track.findIndex(col =>
+        oldPosX >= col[0] && oldPosX <= col[1] && polarity * newPosX < polarity * col[order]);
+
+    if (trackHit === (track.length - 1) * order && track[trackHit][2]) {
         // wrap
-        return track[0][0];
+        return track[(track.length - 1) * (1 - order)][1 - order];
     }
 
     if (trackHit === -1) {
         return newPosX;
     }
 
-    return track[trackHit][1];
-}
-export function hitWallWest(track, oldPosX, newPosX) {
-    const trackHit = track.findIndex(([colA, colB]) =>
-        oldPosX >= colA && oldPosX <= colB && newPosX < colA);
-
-    if (trackHit === 0 && track[trackHit][2]) {
-        // wrap
-        return track[track.length - 1][1];
-    }
-
-    if (trackHit === -1) {
-        return newPosX;
-    }
-
-    return track[trackHit][0];
+    return track[trackHit][order];
 }
 
 function getNewPositionEast(player, time) {
@@ -54,7 +42,7 @@ function getNewPositionEast(player, time) {
 
     const track = tracks.rows[newPosY];
 
-    const newPosX = hitWallEast(track, player.position[0], player.position[0] + PLAYER_SPEED * time);
+    const newPosX = hitWallHorizontal(track, DIRECTION_EAST, player.position[0], player.position[0] + PLAYER_SPEED * time);
 
     return [newPosX, newPosY];
 }
@@ -63,7 +51,7 @@ function getNewPositionWest(player, time) {
 
     const track = tracks.rows[newPosY];
 
-    const newPosX = hitWallWest(track, player.position[0], player.position[0] - PLAYER_SPEED * time);
+    const newPosX = hitWallHorizontal(track, DIRECTION_WEST, player.position[0], player.position[0] - PLAYER_SPEED * time);
 
     return [newPosX, newPosY];
 }
