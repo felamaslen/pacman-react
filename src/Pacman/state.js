@@ -1,3 +1,5 @@
+import { DIRECTION_EAST, DIRECTION_NORTH, DIRECTION_WEST, DIRECTION_SOUTH } from './constants';
+
 function isBigFood([posX, posY]) {
     return (posX === 0 || posX === 25) && (posY === 6 || posY === 26);
 }
@@ -51,33 +53,34 @@ export default function getInitialState() {
     return {
         player: {
             position: [12.5, 6],
+            direction: DIRECTION_EAST,
             lives: 3
         },
         monsters: [
             {
                 id: 'monster-cyan',
-                direction: 0,
+                direction: DIRECTION_EAST,
                 live: true,
                 color: 'cyan',
                 position: [10.5, 15]
             },
             {
                 id: 'monster-red',
-                direction: 1,
+                direction: DIRECTION_NORTH,
                 live: true,
                 color: 'red',
                 position: [12.5, 15]
             },
             {
                 id: 'monster-orange',
-                direction: 2,
+                direction: DIRECTION_WEST,
                 live: true,
                 color: 'darkorange',
                 position: [14.5, 15]
             },
             {
                 id: 'monster-pink',
-                direction: 3,
+                direction: DIRECTION_SOUTH,
                 live: true,
                 color: 'pink',
                 position: [12.5, 17]
@@ -85,7 +88,7 @@ export default function getInitialState() {
 
         ],
         food: generateFood(),
-        eating: true
+        eating: false
     };
 }
 
