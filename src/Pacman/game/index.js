@@ -18,9 +18,7 @@ function getEatenFoodWest(food, oldPosition, newPosition) {
         posY === posYA && posX <= posXA && posX >= posXB);
 }
 
-function hitWallEast(posY, oldPosX, newPosX) {
-    const track = tracks.rows[posY];
-
+export function hitWallEast(track, oldPosX, newPosX) {
     const trackHit = track.findIndex(([colA, colB]) =>
         oldPosX >= colA && oldPosX <= colB && newPosX > colB);
 
@@ -35,9 +33,7 @@ function hitWallEast(posY, oldPosX, newPosX) {
 
     return track[trackHit][1];
 }
-function hitWallWest(posY, oldPosX, newPosX) {
-    const track = tracks.rows[posY];
-
+export function hitWallWest(track, oldPosX, newPosX) {
     const trackHit = track.findIndex(([colA, colB]) =>
         oldPosX >= colA && oldPosX <= colB && newPosX < colA);
 
@@ -55,13 +51,19 @@ function hitWallWest(posY, oldPosX, newPosX) {
 
 function getNewPositionEast(player, time) {
     const newPosY = Math.floor(player.position[1]);
-    const newPosX = hitWallEast(newPosY, player.position[0], player.position[0] + PLAYER_SPEED * time);
+
+    const track = tracks.rows[newPosY];
+
+    const newPosX = hitWallEast(track, player.position[0], player.position[0] + PLAYER_SPEED * time);
 
     return [newPosX, newPosY];
 }
 function getNewPositionWest(player, time) {
     const newPosY = Math.floor(player.position[1]);
-    const newPosX = hitWallWest(newPosY, player.position[0], player.position[0] - PLAYER_SPEED * time);
+
+    const track = tracks.rows[newPosY];
+
+    const newPosX = hitWallWest(track, player.position[0], player.position[0] - PLAYER_SPEED * time);
 
     return [newPosX, newPosY];
 }
