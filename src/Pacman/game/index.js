@@ -81,3 +81,13 @@ export function animate(state, { time = Date.now() } = {}) {
     return statePlayerAnimated;
 }
 
+export function changeDirection(state, { direction }) {
+    return {
+        ...state,
+        player: {
+            ...state.player,
+            direction
+        }
+    };
+}
+

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { DIRECTION_EAST, DIRECTION_NORTH, DIRECTION_WEST, DIRECTION_SOUTH } from './constants';
 import getInitialState from './state';
-import { animate } from './game';
+import { animate, changeDirection } from './game';
 import Board from './Board';
 import AllFood from './AllFood';
 import Monster from './Monster';
@@ -14,20 +15,37 @@ export default class Pacman extends Component {
 
         this.state = getInitialState();
 
-        this.onSpace = evt => {
+        this.onKey = evt => {
             if (evt.code === 'Space') {
-                this.step();
+                return this.step();
             }
+            if (evt.key === 'ArrowRight') {
+                return this.changeDirection(DIRECTION_EAST);
+            }
+            if (evt.key === 'ArrowUp') {
+                return this.changeDirection(DIRECTION_NORTH);
+            }
+            if (evt.key === 'ArrowLeft') {
+                return this.changeDirection(DIRECTION_WEST);
+            }
+            if (evt.key === 'ArrowDown') {
+                return this.changeDirection(DIRECTION_SOUTH);
+            }
+
+            return null;
         };
     }
     componentDidMount() {
-        window.addEventListener('keydown', this.onSpace);
+        window.addEventListener('keydown', this.onKey);
     }
     componentWillUnmount() {
-        window.removeEventListener('keydown', this.onSpace);
+        window.removeEventListener('keydown', this.onKey);
     }
     step() {
         this.setState(animate(this.state, { time: this.state.stepTime + 100 }));
+    }
+    changeDirection(direction) {
+        this.setState(changeDirection(this.state, { direction }));
     }
     render() {
         const monsters = this.state.monsters.map(({ id, ...monster }) => (
