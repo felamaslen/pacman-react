@@ -16,9 +16,6 @@ export default class Pacman extends Component {
         this.state = getInitialState();
 
         this.onKey = evt => {
-            if (evt.code === 'Space') {
-                return this.step();
-            }
             if (evt.key === 'ArrowRight') {
                 return this.changeDirection(EAST);
             }
@@ -34,12 +31,24 @@ export default class Pacman extends Component {
 
             return null;
         };
+
+        this.timers = {
+            start: null,
+            animate: null
+        };
     }
     componentDidMount() {
         window.addEventListener('keydown', this.onKey);
+
+        this.timers.start = setTimeout(() => {
+            this.timers.animate = setInterval(() => this.step(), 25);
+        }, 3000);
     }
     componentWillUnmount() {
         window.removeEventListener('keydown', this.onKey);
+
+        clearTimeout(this.timers.start);
+        clearInterval(this.timers.animate);
     }
     step() {
         this.setState(animate(this.state, { time: this.state.stepTime + 100 }));

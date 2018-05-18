@@ -1,7 +1,7 @@
 import { orderPolarity } from '../helpers';
 import tracks from './tracks';
 
-const PLAYER_SPEED = 1; // dots per second
+const PLAYER_SPEED = 2; // dots per second
 const TURN_TOLERANCE = 0.1;
 
 function getEatenFood(food, player, newPosition) {
