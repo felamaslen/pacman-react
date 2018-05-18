@@ -1,30 +1,16 @@
-import { EAST, NORTH, WEST, SOUTH } from '../constants';
 import { orderPolarity } from '../helpers';
 import * as tracks from './tracks';
 
 const PLAYER_SPEED = 1; // dots per second
 
-function getEatenFoodHorizontal(direction, food, oldPosition, newPosition) {
-    const [posXA, posYA] = oldPosition;
-    const [posXB] = newPosition;
+function getEatenFood(direction, food, oldPosition, newPosition) {
+    const { plane, polarity } = orderPolarity(direction);
 
-    const { polarity } = orderPolarity(direction);
-
-    return food.findIndex(({ position: [posX, posY], eaten }) => !eaten &&
-        posY === posYA &&
-        polarity * posX <= polarity * posXA &&
-        polarity * posX >= polarity * posXB);
-}
-function getEatenFoodVertical(direction, food, oldPosition, newPosition) {
-    const [posXA, posYA] = oldPosition;
-    const [, posYB] = newPosition;
-
-    const { polarity } = orderPolarity(direction);
-
-    return food.findIndex(({ position: [posX, posY], eaten }) => !eaten &&
-        posX === posXA &&
-        polarity * posY <= polarity * posYA &&
-        polarity * posY >= polarity * posYB);
+    return food.findIndex(({ position, eaten }) => !eaten &&
+        position[1 - plane] === oldPosition[1 - plane] &&
+        polarity * position[plane] <= polarity * oldPosition[plane] &&
+        polarity * position[plane] >= polarity * newPosition[plane]
+    );
 }
 
 export function hitWallHorizontal(track, { order, polarity }, oldPosX, newPosX) {
@@ -90,7 +76,7 @@ function animatePlayer(state, time) {
     if (horizontal) {
         const newPosition = getNewPositionHorizontal(direction, player, time);
 
-        const eatenFoodIndex = getEatenFoodHorizontal(direction, state.food, player.position, newPosition);
+        const eatenFoodIndex = getEatenFood(direction, state.food, player.position, newPosition);
 
         const food = state.food.slice();
         if (eatenFoodIndex > -1) {
@@ -109,7 +95,7 @@ function animatePlayer(state, time) {
 
     const newPosition = getNewPositionVertical(direction, player, time);
 
-    const eatenFoodIndex = getEatenFoodVertical(direction, state.food, player.position, newPosition);
+    const eatenFoodIndex = getEatenFood(direction, state.food, player.position, newPosition);
 
     const food = state.food.slice();
     if (eatenFoodIndex > -1) {
