@@ -56,21 +56,31 @@ export default function getInitialState() {
         monsters: [
             {
                 id: 'monster-cyan',
+                direction: 0,
                 live: true,
                 color: 'cyan',
                 position: [10.5, 15]
             },
             {
                 id: 'monster-red',
+                direction: 1,
                 live: true,
                 color: 'red',
                 position: [12.5, 15]
             },
             {
+                id: 'monster-orange',
+                direction: 2,
+                live: true,
+                color: 'darkorange',
+                position: [14.5, 15]
+            },
+            {
                 id: 'monster-pink',
+                direction: 3,
                 live: true,
                 color: 'pink',
-                position: [14.5, 15]
+                position: [12.5, 17]
             }
 
         ],

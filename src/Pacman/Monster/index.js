@@ -1,16 +1,45 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DIRECTION_EAST, DIRECTION_NORTH, DIRECTION_WEST, DIRECTION_SOUTH } from '../constants';
 import { cssPosition } from '../helpers';
 import './style.scss';
 
-function MonsterEye({ gridSize, offset, direction }) {
-    return null;
+function MonsterEye({ radius, offset, direction }) {
+    const eyeballCenterX = radius * (1 + 0.4 * offset);
+    const eyeballCenterY = radius * 0.7;
+    const eyeballRadius = radius * 0.3;
+
+    const reverse = (-1) ** ((direction < 2) >> 0);
+    const vertical = direction % 2;
+    const horizontal = 1 - vertical;
+
+    const irisOffsetX = -horizontal * reverse;
+    const irisOffsetY = vertical * reverse;
+
+    const outerProps = {
+        cx: eyeballCenterX,
+        cy: eyeballCenterY,
+        'r': eyeballRadius,
+        fill: 'white'
+    };
+
+    const irisProps = {
+        cx: eyeballCenterX + eyeballRadius / 2 * irisOffsetX,
+        cy: eyeballCenterY + eyeballRadius / 2 * irisOffsetY,
+        'r': eyeballRadius / 2,
+        fill: 'black'
+    };
+
+    return (
+        <g className="eye">
+            <circle {...outerProps} />
+            <circle {...irisProps} />
+        </g>
+    );
 }
 
 MonsterEye.propTypes = {
+    radius: PropTypes.number.isRequired,
     offset: PropTypes.number.isRequired,
-    gridSize: PropTypes.number.isRequired,
     direction: PropTypes.number.isRequired
 };
 
@@ -56,8 +85,8 @@ function MonsterIcon(props) {
     return (
         <svg className="pacman-monster" style={style}>
             <path d={monsterPath} {...pathProps} />
-            <MonsterEye {...props} offset={-1} />
-            <MonsterEye {...props} offset={1} />
+            <MonsterEye radius={radius} {...props} offset={-1} />
+            <MonsterEye radius={radius} {...props} offset={1} />
         </svg>
     );
 }
@@ -75,12 +104,13 @@ export default class Monster extends Component {
         super(props);
 
         this.state = {
-            direction: DIRECTION_EAST
+            direction: props.direction
         };
     }
     static propTypes = {
         gridSize: PropTypes.number.isRequired,
         position: PropTypes.array.isRequired,
+        direction: PropTypes.number.isRequired,
         color: PropTypes.string.isRequired,
         live: PropTypes.bool.isRequired
     };
