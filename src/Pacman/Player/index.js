@@ -33,8 +33,7 @@ export default class Player extends Component {
         super(props);
 
         this.state = {
-            angle: 1,
-            direction: 0
+            angle: 1
         };
 
         this.startTime = Date.now();
@@ -53,7 +52,7 @@ export default class Player extends Component {
         clearInterval(this.timer);
     }
     render() {
-        const { gridSize, position } = this.props;
+        const { gridSize, position, direction } = this.props;
 
         const pathProps = {
             stroke: 'none',
@@ -72,7 +71,7 @@ export default class Player extends Component {
 
         return (
             <svg className="pacman-player" style={style}>
-                <path d={pacmanPath(radius, this.state.angle, this.state.direction)} {...pathProps} />
+                <path d={pacmanPath(radius, this.state.angle, direction)} {...pathProps} />
             </svg>
         );
     }
@@ -81,6 +80,7 @@ export default class Player extends Component {
 Player.propTypes = {
     animate: PropTypes.bool,
     gridSize: PropTypes.number.isRequired,
-    position: PropTypes.array.isRequired
+    position: PropTypes.array.isRequired,
+    direction: PropTypes.number.isRequired
 };
 
