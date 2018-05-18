@@ -10,33 +10,58 @@ function getEatenFoodEast(food, oldPosition, newPosition) {
     return food.findIndex(({ position: [posX, posY], eaten }) => !eaten &&
         posY === posYA && posX >= posXA && posX <= posXB);
 }
+function getEatenFoodWest(food, oldPosition, newPosition) {
+    const [posXA, posYA] = oldPosition;
+    const [posXB] = newPosition;
+
+    return food.findIndex(({ position: [posX, posY], eaten }) => !eaten &&
+        posY === posYA && posX <= posXA && posX >= posXB);
+}
 
 function hitWallEast(posY, oldPosX, newPosX) {
     const track = tracks.rows[posY];
 
-    const trackHit = track.slice(1)
-        .findIndex((col, index) => oldPosX >= track[index] && oldPosX <= col &&
-            newPosX > col);
+    const trackHit = track.findIndex(([colA, colB]) =>
+        oldPosX >= colA && oldPosX <= colB && newPosX > colB);
+
+    if (trackHit === track.length - 1 && track[trackHit][2]) {
+        // wrap
+        return track[0][0];
+    }
 
     if (trackHit === -1) {
-        if (track[track.length - 2] === Infinity && newPosX > track[track.length - 1]) {
-            return track[0];
-        }
-
-        return null;
+        return newPosX;
     }
 
-    return track[trackHit + 1];
+    return track[trackHit][1];
+}
+function hitWallWest(posY, oldPosX, newPosX) {
+    const track = tracks.rows[posY];
+
+    const trackHit = track.findIndex(([colA, colB]) =>
+        oldPosX >= colA && oldPosX <= colB && newPosX < colA);
+
+    if (trackHit === 0 && track[trackHit][2]) {
+        // wrap
+        return track[track.length - 1][1];
+    }
+
+    if (trackHit === -1) {
+        return newPosX;
+    }
+
+    return track[trackHit][0];
 }
 
-function getNewPositionEast(player, walls, time) {
-    let newPosX = player.position[0] + PLAYER_SPEED * time;
+function getNewPositionEast(player, time) {
     const newPosY = Math.floor(player.position[1]);
+    const newPosX = hitWallEast(newPosY, player.position[0], player.position[0] + PLAYER_SPEED * time);
 
-    const wallCollision = hitWallEast(newPosY, player.position[0], newPosX);
-    if (wallCollision) {
-        newPosX = wallCollision;
-    }
+    return [newPosX, newPosY];
+}
+function getNewPositionWest(player, time) {
+    const newPosY = Math.floor(player.position[1]);
+    const newPosX = hitWallWest(newPosY, player.position[0], player.position[0] - PLAYER_SPEED * time);
 
     return [newPosX, newPosY];
 }
@@ -49,9 +74,28 @@ function animatePlayer(state, time) {
     const vertical = !horizontal;
 
     if (direction === DIRECTION_EAST) {
-        const newPosition = getNewPositionEast(player, state.walls, time);
+        const newPosition = getNewPositionEast(player, time);
 
         const eatenFoodIndex = getEatenFoodEast(state.food, player.position, newPosition);
+
+        const food = state.food.slice();
+        if (eatenFoodIndex > -1) {
+            food[eatenFoodIndex].eaten = true;
+        }
+
+        return {
+            ...state,
+            player: {
+                ...player,
+                position: newPosition
+            },
+            food
+        };
+    }
+    if (direction === DIRECTION_WEST) {
+        const newPosition = getNewPositionWest(player, time);
+
+        const eatenFoodIndex = getEatenFoodWest(state.food, player.position, newPosition);
 
         const food = state.food.slice();
         if (eatenFoodIndex > -1) {
