@@ -84,7 +84,8 @@ export default function getInitialState() {
             }
 
         ],
-        food: generateFood()
+        food: generateFood(),
+        eating: true
     };
 }
 

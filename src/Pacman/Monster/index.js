@@ -64,14 +64,55 @@ function getMonsterPath(radius) {
         .join(' ');
 }
 
-function MonsterIcon(props) {
-    const { position, gridSize, color } = props;
+function WaveMouth({ gridSize, eating }) {
+    if (!eating) {
+        return null;
+    }
 
+    const waveRadius = gridSize * 0.125;
+    const yPos = gridSize * 0.95;
+
+    const mouthPath = [
+        `M${waveRadius * 2},${yPos}`,
+        `A${waveRadius},${waveRadius * 5} 0 0 1 ${3 * waveRadius},${yPos}`,
+        `A${waveRadius},${waveRadius * 5} 0 0 0 ${4 * waveRadius},${yPos}`,
+        `A${waveRadius},${waveRadius * 5} 0 0 1 ${5 * waveRadius},${yPos}`,
+        `A${waveRadius},${waveRadius * 5} 0 0 0 ${6 * waveRadius},${yPos}`,
+        `A${waveRadius},${waveRadius * 5} 0 0 1 ${7 * waveRadius},${yPos}`,
+        `A${waveRadius},${waveRadius * 5} 0 0 0 ${8 * waveRadius},${yPos}`,
+        `A${waveRadius},${waveRadius * 5} 0 0 1 ${9 * waveRadius},${yPos}`,
+        `A${waveRadius},${waveRadius * 5} 0 0 0 ${10 * waveRadius},${yPos}`
+    ]
+        .join(' ');
+
+    return (
+        <path d={mouthPath} stroke="white" strokeWidth={1} />
+    );
+}
+
+WaveMouth.propTypes = {
+    gridSize: PropTypes.number.isRequired,
+    eating: PropTypes.bool.isRequired
+};
+
+function getColor(eating, eatingFlash, color) {
+    if (eating) {
+        if (eatingFlash) {
+            return '#c9a';
+        }
+
+        return '#06c';
+    }
+
+    return color;
+}
+
+function MonsterIcon({ gridSize, eating, eatingFlash, position, direction, color }) {
     const radius = gridSize * 0.75;
     const monsterPath = getMonsterPath(radius);
     const pathProps = {
         stroke: 'none',
-        fill: color
+        fill: getColor(eating, eatingFlash, color)
     };
 
     const style = {
@@ -85,13 +126,16 @@ function MonsterIcon(props) {
     return (
         <svg className="pacman-monster" style={style}>
             <path d={monsterPath} {...pathProps} />
-            <MonsterEye radius={radius} {...props} offset={-1} />
-            <MonsterEye radius={radius} {...props} offset={1} />
+            <WaveMouth gridSize={gridSize} eating={eating} />
+            <MonsterEye radius={radius} direction={direction} offset={-1} />
+            <MonsterEye radius={radius} direction={direction} offset={1} />
         </svg>
     );
 }
 
 MonsterIcon.propTypes = {
+    eating: PropTypes.bool.isRequired,
+    eatingFlash: PropTypes.number,
     gridSize: PropTypes.number.isRequired,
     position: PropTypes.array.isRequired,
     color: PropTypes.string.isRequired,
@@ -104,11 +148,35 @@ export default class Monster extends Component {
         super(props);
 
         this.state = {
-            direction: props.direction
+            direction: props.direction,
+            eatingFlash: 0,
+            timerFlash: this.getTimerFlash()
         };
+    }
+    getTimerFlash() {
+        if (this.state) {
+            clearInterval(this.state.timerFlash);
+        }
+
+        if (!this.props.eating) {
+            return null;
+        }
+
+        return setInterval(() => {
+            this.setState({ eatingFlash: (this.state.eatingFlash + 1) % 2 });
+        }, 500);
+    }
+    componentDidUpdate(prevProps) {
+        if (this.props.eating !== prevProps.eating) {
+            this.setState({ timerFlash: this.getTimerFlash() });
+        }
+    }
+    componentWillUnmount() {
+        clearInterval(this.state.timerFlash);
     }
     static propTypes = {
         gridSize: PropTypes.number.isRequired,
+        eating: PropTypes.bool.isRequired,
         position: PropTypes.array.isRequired,
         direction: PropTypes.number.isRequired,
         color: PropTypes.string.isRequired,
