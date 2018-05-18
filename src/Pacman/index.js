@@ -27,7 +27,7 @@ export default class Pacman extends Component {
         window.removeEventListener('keydown', this.onSpace);
     }
     step() {
-        this.setState(animate(this.state));
+        this.setState(animate(this.state, { time: this.state.stepTime + 100 }));
     }
     render() {
         const monsters = this.state.monsters.map(({ id, ...monster }) => (
