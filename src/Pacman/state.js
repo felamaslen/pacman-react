@@ -1,4 +1,4 @@
-import { DIRECTION_EAST, DIRECTION_NORTH, DIRECTION_WEST, DIRECTION_SOUTH } from './constants';
+import { EAST, NORTH, WEST, SOUTH } from './constants';
 
 function isBigFood([posX, posY]) {
     return (posX === 0 || posX === 25) && (posY === 6 || posY === 26);
@@ -54,34 +54,34 @@ export default function getInitialState() {
         stepTime: Date.now(),
         player: {
             position: [12.5, 6],
-            direction: DIRECTION_EAST,
+            direction: EAST,
             lives: 3
         },
         monsters: [
             {
                 id: 'monster-cyan',
-                direction: DIRECTION_EAST,
+                direction: EAST,
                 live: true,
                 color: 'cyan',
                 position: [10.5, 15]
             },
             {
                 id: 'monster-red',
-                direction: DIRECTION_NORTH,
+                direction: NORTH,
                 live: true,
                 color: 'red',
                 position: [12.5, 15]
             },
             {
                 id: 'monster-orange',
-                direction: DIRECTION_WEST,
+                direction: WEST,
                 live: true,
                 color: 'darkorange',
                 position: [14.5, 15]
             },
             {
                 id: 'monster-pink',
-                direction: DIRECTION_SOUTH,
+                direction: SOUTH,
                 live: true,
                 color: 'pink',
                 position: [12.5, 17]
