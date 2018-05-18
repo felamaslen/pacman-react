@@ -7,10 +7,11 @@ export function cssPosition(position, gridSize) {
     };
 }
 
-export function orderPolarityHorizontal(direction) {
+export function orderPolarity(direction) {
     const order = (direction < 2) >> 0;
     const polarity = (-1) ** order;
 
     return { order, polarity };
 }
+
 
