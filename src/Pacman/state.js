@@ -82,7 +82,7 @@ export default function getInitialState() {
             },
             {
                 id: 'monster-pink',
-                direction: SOUTH,
+                direction: NORTH,
                 live: true,
                 color: 'pink',
                 position: [12.5, 17]

@@ -1,8 +1,14 @@
 import { orderPolarity } from '../helpers';
 import tracks from './tracks';
+import { EAST, NORTH, WEST, SOUTH } from '../constants';
 
 const PLAYER_SPEED = 2; // dots per second
+const MONSTER_SPEED_ATTACK = 2;
+const MONSTER_SPEED_RETREAT = 1.5;
 const TURN_TOLERANCE = 0.1;
+
+const MONSTER_HOME_RANGE = [17, 18, 8, 12];
+const MONSTER_HOME_EXIT_COL = 12.5;
 
 function getEatenFood(food, player, newPosition) {
     const { plane, polarity } = orderPolarity(player.direction);
@@ -12,6 +18,37 @@ function getEatenFood(food, player, newPosition) {
         polarity * position[plane] <= polarity * player.position[plane] &&
         polarity * position[plane] >= polarity * newPosition[plane]
     );
+}
+
+function getNewPosition(position, direction, speed, time, toNearestPlane = true) {
+    const { order, plane, polarity } = orderPolarity(direction);
+
+    const newPosition = position.slice();
+
+    const nearestOtherPlane = Math.round(newPosition[1 - plane]);
+    if (toNearestPlane) {
+        newPosition[1 - plane] = nearestOtherPlane;
+    }
+
+    newPosition[plane] -= polarity * speed * time;
+
+    const track = tracks[plane][nearestOtherPlane];
+
+    const trackHit = track.findIndex(limits =>
+        position[plane] >= limits[0] &&
+        position[plane] <= limits[1] &&
+        polarity * newPosition[plane] < polarity * limits[order]
+    );
+
+    if (trackHit === (track.length - 1) * order && track[trackHit][2]) {
+        // wrap
+        newPosition[plane] = track[(track.length - 1) * (1 - order)][1 - order];
+    }
+    else if (trackHit > -1) {
+        newPosition[plane] = track[trackHit][order];
+    }
+
+    return newPosition;
 }
 
 function getChangedVector(oldPosition, newPosition, oldDirection, newDirection) {
@@ -53,30 +90,8 @@ function getChangedVector(oldPosition, newPosition, oldDirection, newDirection) 
     return null;
 }
 
-function getNewPosition(player, time) {
-    const { order, plane, polarity } = orderPolarity(player.direction);
-
-    const newPosition = player.position.slice();
-
-    newPosition[1 - plane] = Math.round(newPosition[1 - plane]);
-
-    newPosition[plane] -= polarity * PLAYER_SPEED * time;
-
-    const track = tracks[plane][newPosition[1 - plane]];
-
-    const trackHit = track.findIndex(limits =>
-        player.position[plane] >= limits[0] &&
-        player.position[plane] <= limits[1] &&
-        polarity * newPosition[plane] < polarity * limits[order]
-    );
-
-    if (trackHit === (track.length - 1) * order && track[trackHit][2]) {
-        // wrap
-        newPosition[plane] = track[(track.length - 1) * (1 - order)][1 - order];
-    }
-    else if (trackHit > -1) {
-        newPosition[plane] = track[trackHit][order];
-    }
+function getNewPlayerPosition(player, time) {
+    const newPosition = getNewPosition(player.position, player.direction, PLAYER_SPEED, time);
 
     if (player.nextDirection !== player.direction) {
         const changedVector = getChangedVector(player.position, newPosition,
@@ -90,8 +105,66 @@ function getNewPosition(player, time) {
     return { position: newPosition };
 }
 
+function getIsHome(monster) {
+    return monster.position[0] > MONSTER_HOME_RANGE[WEST] &&
+        monster.position[0] < MONSTER_HOME_RANGE[EAST] &&
+        monster.position[1] > MONSTER_HOME_RANGE[SOUTH] &&
+        monster.position[1] < MONSTER_HOME_RANGE[NORTH];
+}
+
+function animateMonster(state, time, monster, index) {
+    const isHome = getIsHome(monster);
+
+    const newPosition = getNewPosition(monster.position, monster.direction,
+        MONSTER_SPEED_ATTACK, time, !isHome);
+
+    let newDirection = monster.direction;
+
+    if (isHome) {
+        if ((monster.direction === EAST &&
+            monster.position[0] < MONSTER_HOME_EXIT_COL &&
+            newPosition[0] >= MONSTER_HOME_EXIT_COL) ||
+
+            (monster.direction === WEST &&
+            monster.position[0] > MONSTER_HOME_EXIT_COL &&
+            newPosition[0] <= MONSTER_HOME_EXIT_COL)
+        ) {
+            newPosition[0] = MONSTER_HOME_EXIT_COL;
+            newDirection = NORTH;
+        }
+        else if (monster.direction === NORTH &&
+            monster.position[1] < MONSTER_HOME_RANGE[NORTH] &&
+            newPosition[1] >= MONSTER_HOME_RANGE[NORTH]) {
+
+            newPosition[1] = MONSTER_HOME_RANGE[NORTH];
+            newDirection = monster.position[0] < state.player.position[0]
+                ? EAST
+                : WEST;
+        }
+    }
+
+    const newMonster = {
+        ...monster,
+        position: newPosition,
+        direction: newDirection
+    };
+
+    const newMonsters = state.monsters.slice();
+    newMonsters[index] = newMonster;
+
+    return {
+        ...state,
+        monsters: newMonsters
+    };
+}
+
+function animateMonsters(state, time) {
+    return state.monsters.reduce((lastState, monster, index) =>
+        animateMonster(lastState, time, monster, index), state);
+}
+
 function animatePlayer(state, time) {
-    const newVector = getNewPosition(state.player, time);
+    const newVector = getNewPlayerPosition(state.player, time);
     const eatenFoodIndex = getEatenFood(state.food, state.player, newVector.position);
     const food = state.food.slice();
     if (eatenFoodIndex > -1) {
@@ -115,7 +188,9 @@ export function animate(state, { time = Date.now() } = {}) {
 
     const statePlayerAnimated = animatePlayer({ ...state, stepTime: time }, timeSeconds);
 
-    return statePlayerAnimated;
+    const stateMonstersAnimated = animateMonsters(statePlayerAnimated, timeSeconds);
+
+    return stateMonstersAnimated;
 }
 
 export function changeDirection(state, { direction }) {
