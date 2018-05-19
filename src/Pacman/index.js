@@ -42,7 +42,7 @@ export default class Pacman extends Component {
 
         this.timers.start = setTimeout(() => {
             this.timers.animate = setInterval(() => this.step(), 25);
-        }, 3000);
+        }, 3000 * (this.props.animate >> 0));
     }
     componentWillUnmount() {
         window.removeEventListener('keydown', this.onKey);
@@ -73,6 +73,7 @@ export default class Pacman extends Component {
 }
 
 Pacman.propTypes = {
+    animate: PropTypes.bool,
     gridSize: PropTypes.number.isRequired
 };
 
