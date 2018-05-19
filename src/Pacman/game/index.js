@@ -40,15 +40,19 @@ function getNewPosition(position, direction, speed, time, toNearestPlane = true)
         polarity * newPosition[plane] < polarity * limits[order]
     );
 
+    let collision = false;
+
     if (trackHit === (track.length - 1) * order && track[trackHit][2]) {
         // wrap
         newPosition[plane] = track[(track.length - 1) * (1 - order)][1 - order];
     }
     else if (trackHit > -1) {
         newPosition[plane] = track[trackHit][order];
+
+        collision = true;
     }
 
-    return newPosition;
+    return { newPosition, collision };
 }
 
 function getChangedVector(oldPosition, newPosition, oldDirection, newDirection) {
@@ -91,7 +95,8 @@ function getChangedVector(oldPosition, newPosition, oldDirection, newDirection) 
 }
 
 function getNewPlayerPosition(player, time) {
-    const newPosition = getNewPosition(player.position, player.direction, PLAYER_SPEED, time);
+    const { newPosition } = getNewPosition(player.position, player.direction,
+        PLAYER_SPEED, time);
 
     if (player.nextDirection !== player.direction) {
         const changedVector = getChangedVector(player.position, newPosition,
@@ -105,6 +110,66 @@ function getNewPlayerPosition(player, time) {
     return { position: newPosition };
 }
 
+function getNextMonsterHomePosition(newPosition, monster, player) {
+    if ((monster.direction === EAST &&
+        monster.position[0] < MONSTER_HOME_EXIT_COL &&
+        newPosition[0] >= MONSTER_HOME_EXIT_COL) ||
+
+        (monster.direction === WEST &&
+        monster.position[0] > MONSTER_HOME_EXIT_COL &&
+        newPosition[0] <= MONSTER_HOME_EXIT_COL)
+    ) {
+
+        return {
+            position: [MONSTER_HOME_EXIT_COL, newPosition[1]],
+            direction: NORTH
+        };
+    }
+    if (monster.direction === NORTH &&
+        monster.position[1] < MONSTER_HOME_RANGE[NORTH] &&
+        newPosition[1] >= MONSTER_HOME_RANGE[NORTH]) {
+
+        return {
+            position: [newPosition[0], MONSTER_HOME_RANGE[NORTH]],
+            direction: monster.position[0] < player.position[0]
+                ? EAST
+                : WEST
+        };
+    }
+
+    return { position: newPosition };
+}
+
+function getNavigatedMonsterPosition(newPosition, monster, player) {
+    const { order, plane, polarity } = orderPolarity(monster.direction);
+
+    const nextTrack = tracks[1 - plane][newPosition[plane]]
+        .find(([start, end ]) => newPosition[1 - plane] >= start &&
+            newPosition[1 - plane] <= end);
+
+    const options = [null, null];
+    if (nextTrack[0] < newPosition[1 - plane]) {
+        options[0] = plane === 0
+            ? SOUTH
+            : WEST;
+    }
+    if (nextTrack[1] > newPosition[1 - plane]) {
+        options[1] = plane === 0
+            ? NORTH
+            : EAST;
+    }
+
+    if (options[0] === null || options[1] === null) {
+        return { direction: options.find(item => item !== null) };
+    }
+
+    if (newPosition[1 - plane] < player.position[1 - plane]) {
+        return { direction: options[1] };
+    }
+
+    return { direction: options[0] };
+}
+
 function getIsHome(monster) {
     return monster.position[0] > MONSTER_HOME_RANGE[WEST] &&
         monster.position[0] < MONSTER_HOME_RANGE[EAST] &&
@@ -112,41 +177,26 @@ function getIsHome(monster) {
         monster.position[1] < MONSTER_HOME_RANGE[NORTH];
 }
 
-function animateMonster(state, time, monster, index) {
+function getNewMonsterPosition(monster, player, time) {
     const isHome = getIsHome(monster);
 
-    const newPosition = getNewPosition(monster.position, monster.direction,
+    const { newPosition, collision } = getNewPosition(monster.position, monster.direction,
         MONSTER_SPEED_ATTACK, time, !isHome);
 
-    let newDirection = monster.direction;
-
     if (isHome) {
-        if ((monster.direction === EAST &&
-            monster.position[0] < MONSTER_HOME_EXIT_COL &&
-            newPosition[0] >= MONSTER_HOME_EXIT_COL) ||
-
-            (monster.direction === WEST &&
-            monster.position[0] > MONSTER_HOME_EXIT_COL &&
-            newPosition[0] <= MONSTER_HOME_EXIT_COL)
-        ) {
-            newPosition[0] = MONSTER_HOME_EXIT_COL;
-            newDirection = NORTH;
-        }
-        else if (monster.direction === NORTH &&
-            monster.position[1] < MONSTER_HOME_RANGE[NORTH] &&
-            newPosition[1] >= MONSTER_HOME_RANGE[NORTH]) {
-
-            newPosition[1] = MONSTER_HOME_RANGE[NORTH];
-            newDirection = monster.position[0] < state.player.position[0]
-                ? EAST
-                : WEST;
-        }
+        return getNextMonsterHomePosition(newPosition, monster, player);
+    }
+    if (collision) {
+        return getNavigatedMonsterPosition(newPosition, monster, player);
     }
 
+    return { position: newPosition };
+}
+
+function animateMonster(state, time, monster, index) {
     const newMonster = {
         ...monster,
-        position: newPosition,
-        direction: newDirection
+        ...getNewMonsterPosition(monster, state.player, time)
     };
 
     const newMonsters = state.monsters.slice();
