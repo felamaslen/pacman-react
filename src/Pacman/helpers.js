@@ -15,4 +15,3 @@ export function orderPolarity(direction) {
     return { order, polarity, plane };
 }
 
-

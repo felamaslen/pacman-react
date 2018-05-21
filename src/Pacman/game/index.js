@@ -55,22 +55,30 @@ function getNewPosition(position, direction, speed, time, toNearestPlane = true)
     return { newPosition, collision };
 }
 
+function snapToTrack(plane, order, position, tolerance) {
+    const snap = order
+        ? Math.ceil(position[plane])
+        : Math.floor(position[plane]);
+
+    if (Math.abs(snap - position[plane]) > tolerance) {
+        return -1;
+    }
+
+    return snap;
+}
+
 function getChangedVector(oldPosition, newPosition, oldDirection, newDirection) {
     const { plane: oldPlane, order: oldOrder } = orderPolarity(oldDirection);
 
-    const trackTo = oldOrder
-        ? Math.ceil(newPosition[oldPlane])
-        : Math.floor(newPosition[oldPlane]);
-
-    const cornerDifference = Math.abs(trackTo - newPosition[oldPlane]);
-    if (cornerDifference > TURN_TOLERANCE) {
+    const trackTo = snapToTrack(oldPlane, oldOrder, newPosition, TURN_TOLERANCE);
+    if (trackTo === -1) {
         return null;
     }
 
     const old0 = oldPosition[oldPlane];
     const new0 = newPosition[oldPlane];
 
-    if (!(old0 === new0 && cornerDifference > 0)) {
+    if (!(old0 === new0 && Math.abs(trackTo - newPosition[oldPlane]) > 0)) {
         const { order: newOrder, plane: newPlane, polarity } = orderPolarity(newDirection);
 
         const track = tracks[newPlane][trackTo];
@@ -140,34 +148,108 @@ function getNextMonsterHomePosition(newPosition, monster, player) {
     return { position: newPosition };
 }
 
-function getNavigatedMonsterPosition(newPosition, monster, player) {
-    const { order, plane, polarity } = orderPolarity(monster.direction);
+function distance(posA, posB) {
+    // The Pacman board is a kind of manhattan style map, with constraints
+    // due to walls
 
-    const nextTrack = tracks[1 - plane][newPosition[plane]]
-        .find(([start, end ]) => newPosition[1 - plane] >= start &&
-            newPosition[1 - plane] <= end);
+    return Math.abs(posA[0] - posB[0]) + Math.abs(posA[1] - posB[1]);
+}
 
-    const options = [null, null];
-    if (nextTrack[0] < newPosition[1 - plane]) {
-        options[0] = plane === 0
-            ? SOUTH
-            : WEST;
+function getAvailableMonsterRoutes({ newPosition, collision, plane, trackTo, monster }) {
+    let availableOptions = [];
+    let distanceFromTrack = 0;
+
+    if (trackTo !== -1 && tracks[1 - plane][trackTo]) {
+        const passedTrack = tracks[1 - plane][trackTo]
+            .find(([start, end]) => newPosition[1 - plane] >= start &&
+                newPosition[1 - plane] <= end);
+
+        const options = [null, null];
+        if (passedTrack[0] < newPosition[1 - plane]) {
+            options[0] = plane === 0
+                ? SOUTH
+                : WEST;
+        }
+        if (passedTrack[1] > newPosition[1 - plane]) {
+            options[1] = plane === 0
+                ? NORTH
+                : EAST;
+        }
+
+        availableOptions = options.filter(item => item !== null);
+
+        distanceFromTrack = Math.abs(newPosition[plane] - trackTo);
     }
-    if (nextTrack[1] > newPosition[1 - plane]) {
-        options[1] = plane === 0
-            ? NORTH
-            : EAST;
+
+    if (!collision) {
+        availableOptions.push(monster.direction);
     }
 
-    if (options[0] === null || options[1] === null) {
-        return { direction: options.find(item => item !== null) };
+    return { availableOptions, distanceFromTrack };
+}
+
+function getAvailableVectors({
+    newPosition, plane, trackTo, distanceFromTrack, movedDistance, player, availableOptions
+}) {
+    return availableOptions.map(direction => {
+        const { polarity: optionPolarity, plane: optionPlane } = orderPolarity(direction);
+
+        let position = null;
+        if (plane === optionPlane) {
+            position = newPosition;
+        }
+        else {
+            position = [];
+            position[optionPlane] = newPosition[optionPlane] -
+                Math.max(0, movedDistance - distanceFromTrack) * optionPolarity;
+
+            position[1 - optionPlane] = trackTo;
+        }
+
+        const compare = [];
+        compare[optionPlane] = newPosition[optionPlane] - optionPolarity;
+        compare[1 - optionPlane] = position[1 - optionPlane];
+
+        return { compare, position, direction };
+    })
+        .sort(({ compare: posA }, { compare: posB }) =>
+            distance(posA, player.position) - distance(posB, player.position)
+        )
+        .map(({ direction, position }) => ({ direction, position }));
+}
+
+function getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player) {
+    // determine where to move a monster if it has a decision to make
+    const { order, plane } = orderPolarity(monster.direction);
+
+    const trackTo = snapToTrack(plane, order, newPosition, movedDistance);
+    if (trackTo === -1 && collision) {
+        throw new Error('Collided but nothing to track to');
     }
 
-    if (newPosition[1 - plane] < player.position[1 - plane]) {
-        return { direction: options[1] };
+    const { availableOptions, distanceFromTrack } = getAvailableMonsterRoutes({
+        newPosition, collision, plane, trackTo, monster
+    });
+
+    if (!availableOptions.length) {
+        // this happens when wrapping
+
+        return { position: newPosition };
     }
 
-    return { direction: options[0] };
+    const vectors = getAvailableVectors({
+        newPosition, plane, trackTo, distanceFromTrack, movedDistance, player, availableOptions
+    });
+
+    const distanceFromPlayer = distance(vectors[0].position, player.position);
+
+    if (distanceFromPlayer < movedDistance) {
+        // player got eaten
+
+        return { lost: true };
+    }
+
+    return vectors[0];
 }
 
 function getIsHome(monster) {
@@ -177,7 +259,7 @@ function getIsHome(monster) {
         monster.position[1] < MONSTER_HOME_RANGE[NORTH];
 }
 
-function getNewMonsterPosition(monster, player, time) {
+function getNewMonsterVector(monster, player, time) {
     const isHome = getIsHome(monster);
 
     const { newPosition, collision } = getNewPosition(monster.position, monster.direction,
@@ -186,17 +268,18 @@ function getNewMonsterPosition(monster, player, time) {
     if (isHome) {
         return getNextMonsterHomePosition(newPosition, monster, player);
     }
-    if (collision) {
-        return getNavigatedMonsterPosition(newPosition, monster, player);
-    }
 
-    return { position: newPosition };
+    const movedDistance = Math.abs(MONSTER_SPEED_ATTACK * time);
+
+    return getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player);
 }
 
 function animateMonster(state, time, monster, index) {
+    const { lost, ...monsterVector } = getNewMonsterVector(monster, state.player, time);
+
     const newMonster = {
         ...monster,
-        ...getNewMonsterPosition(monster, state.player, time)
+        ...monsterVector
     };
 
     const newMonsters = state.monsters.slice();
@@ -204,6 +287,7 @@ function animateMonster(state, time, monster, index) {
 
     return {
         ...state,
+        lost: state.lost || Boolean(lost),
         monsters: newMonsters
     };
 }
@@ -235,6 +319,10 @@ export function animate(state, { time = Date.now() } = {}) {
     // get the next game state as a function of time
 
     const timeSeconds = (time - state.stepTime) / 1000;
+
+    if (state.lost) {
+        return state;
+    }
 
     const statePlayerAnimated = animatePlayer({ ...state, stepTime: time }, timeSeconds);
 

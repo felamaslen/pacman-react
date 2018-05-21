@@ -41,7 +41,7 @@ export default class Pacman extends Component {
         window.addEventListener('keydown', this.onKey);
 
         this.timers.start = setTimeout(() => {
-            this.timers.animate = setInterval(() => this.step(), 25);
+            this.step();
         }, 3000 * (this.props.animate >> 0));
     }
     componentWillUnmount() {
@@ -51,7 +51,12 @@ export default class Pacman extends Component {
         clearInterval(this.timers.animate);
     }
     step() {
-        this.setState(animate(this.state, { time: this.state.stepTime + 100 }));
+        const result = animate(this.state, { time: this.state.stepTime + 100 });
+
+        this.setState(result);
+
+        clearTimeout(this.timers.animate);
+        this.timers.aniamte = setTimeout(() => this.step(), 25);
     }
     changeDirection(direction) {
         this.setState(changeDirection(this.state, { direction }));
