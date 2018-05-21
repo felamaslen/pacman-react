@@ -1,3 +1,4 @@
+import { EATING_TIME_SECONDS } from '../constants';
 import { getNewPosition, getChangedVector, orderPolarity } from './movement';
 
 const PLAYER_SPEED = 2; // dots per second
@@ -32,8 +33,13 @@ export function animatePlayer(state, time) {
     const newVector = getNewPlayerPosition(state.player, time);
     const eatenFoodIndex = getEatenFood(state.food, state.player, newVector.position);
     const food = state.food.slice();
+    let eating = state.eating;
     if (eatenFoodIndex > -1) {
         food[eatenFoodIndex].eaten = true;
+
+        if (food[eatenFoodIndex].big) {
+            eating = EATING_TIME_SECONDS;
+        }
     }
 
     return {
@@ -42,7 +48,8 @@ export function animatePlayer(state, time) {
             ...state.player,
             ...newVector
         },
-        food
+        food,
+        eating
     };
 }
 

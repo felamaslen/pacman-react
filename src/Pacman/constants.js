@@ -10,3 +10,5 @@ export const BOARD_HEIGHT = 36;
 
 export const WALL_COLOUR = '#06f';
 
+export const EATING_TIME_SECONDS = 10;
+

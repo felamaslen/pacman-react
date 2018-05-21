@@ -92,7 +92,7 @@ export default function getInitialState() {
             }
         ],
         food: generateFood(),
-        eating: false
+        eatingTime: -1
     };
 }
 
