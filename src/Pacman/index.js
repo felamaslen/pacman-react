@@ -48,7 +48,7 @@ export default class Pacman extends Component {
         window.removeEventListener('keydown', this.onKey);
 
         clearTimeout(this.timers.start);
-        clearInterval(this.timers.animate);
+        clearTimeout(this.timers.animate);
     }
     step() {
         const result = animate(this.state, { time: this.state.stepTime + 100 });
