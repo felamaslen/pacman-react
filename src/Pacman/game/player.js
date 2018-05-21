@@ -13,12 +13,12 @@ function getEatenFood(food, player, newPosition) {
 }
 
 function getNewPlayerPosition(player, time) {
-    const { newPosition } = getNewPosition(player.position, player.direction,
+    const { newPosition, movedDistance } = getNewPosition(player.position, player.direction,
         PLAYER_SPEED, time);
 
     if (player.nextDirection !== player.direction) {
         const changedVector = getChangedVector(player.position, newPosition,
-            player.direction, player.nextDirection);
+            player.direction, player.nextDirection, movedDistance);
 
         if (changedVector) {
             return { position: changedVector, direction: player.nextDirection };

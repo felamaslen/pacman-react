@@ -145,14 +145,12 @@ function getNavigatedMonsterVector(newPosition, collision, movedDistance, monste
 function getNewMonsterVector(monster, player, time) {
     const isHome = getIsHome(monster);
 
-    const { newPosition, collision } = getNewPosition(monster.position, monster.direction,
-        MONSTER_SPEED_ATTACK, time, !isHome);
+    const { newPosition, collision, movedDistance } = getNewPosition(
+        monster.position, monster.direction, MONSTER_SPEED_ATTACK, time, !isHome);
 
     if (isHome) {
         return getNextMonsterHomePosition(newPosition, monster, player);
     }
-
-    const movedDistance = Math.abs(MONSTER_SPEED_ATTACK * time);
 
     return getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player);
 }

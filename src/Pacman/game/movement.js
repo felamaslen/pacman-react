@@ -1,7 +1,5 @@
 import tracks from './tracks';
 
-const TURN_TOLERANCE = 0.1;
-
 export function gridDistance(posA, posB) {
     // The Pacman board is a kind of manhattan style map, with constraints
     // due to walls
@@ -21,13 +19,15 @@ export function getNewPosition(position, direction, speed, time, toNearestPlane 
     const { order, plane, polarity } = orderPolarity(direction);
 
     const newPosition = position.slice();
+    const movedVector = -polarity * speed * time;
+    let movedDistance = Math.abs(movedVector);
 
     const nearestOtherPlane = Math.round(newPosition[1 - plane]);
     if (toNearestPlane) {
         newPosition[1 - plane] = nearestOtherPlane;
     }
 
-    newPosition[plane] -= polarity * speed * time;
+    newPosition[plane] += movedVector;
 
     const track = tracks[plane][nearestOtherPlane];
 
@@ -42,14 +42,18 @@ export function getNewPosition(position, direction, speed, time, toNearestPlane 
     if (trackHit === (track.length - 1) * order && track[trackHit][2]) {
         // wrap
         newPosition[plane] = track[(track.length - 1) * (1 - order)][1 - order];
+
+        movedDistance = speed * time;
     }
     else if (trackHit > -1) {
         newPosition[plane] = track[trackHit][order];
 
+        movedDistance = Math.abs(position[plane] - track[trackHit][order]);
+
         collision = true;
     }
 
-    return { newPosition, collision };
+    return { newPosition, collision, movedDistance };
 }
 
 export function snapToTrack(plane, order, position, tolerance) {
@@ -64,10 +68,10 @@ export function snapToTrack(plane, order, position, tolerance) {
     return snap;
 }
 
-export function getChangedVector(oldPosition, newPosition, oldDirection, newDirection) {
+export function getChangedVector(oldPosition, newPosition, oldDirection, newDirection, movedDistance) {
     const { plane: oldPlane, order: oldOrder } = orderPolarity(oldDirection);
 
-    const trackTo = snapToTrack(oldPlane, oldOrder, newPosition, TURN_TOLERANCE);
+    const trackTo = snapToTrack(oldPlane, oldOrder, newPosition, movedDistance);
     if (trackTo === -1) {
         return null;
     }
@@ -75,7 +79,9 @@ export function getChangedVector(oldPosition, newPosition, oldDirection, newDire
     const old0 = oldPosition[oldPlane];
     const new0 = newPosition[oldPlane];
 
-    if (!(old0 === new0 && Math.abs(trackTo - newPosition[oldPlane]) > 0)) {
+    const movedDistanceBeforeTurn = Math.abs(trackTo - newPosition[oldPlane]);
+
+    if (!(old0 === new0 && movedDistanceBeforeTurn > movedDistance)) {
         const { order: newOrder, plane: newPlane, polarity } = orderPolarity(newDirection);
 
         const track = tracks[newPlane][trackTo];
@@ -91,6 +97,7 @@ export function getChangedVector(oldPosition, newPosition, oldDirection, newDire
             const changedVector = newPosition.slice();
 
             changedVector[oldPlane] = trackTo;
+            changedVector[newPlane] -= polarity * (movedDistance - movedDistanceBeforeTurn);
 
             return changedVector;
         }
