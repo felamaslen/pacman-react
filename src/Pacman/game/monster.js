@@ -20,14 +20,14 @@ function getAvailableVectors({
         }
         else {
             position = [];
-            position[optionPlane] = newPosition[optionPlane] -
+            position[optionPlane] = newPosition[optionPlane] +
                 Math.max(0, movedDistance - distanceFromTrack) * optionPolarity;
 
             position[1 - optionPlane] = trackTo;
         }
 
         const compare = [];
-        compare[optionPlane] = newPosition[optionPlane] - optionPolarity;
+        compare[optionPlane] = newPosition[optionPlane] + optionPolarity;
         compare[1 - optionPlane] = position[1 - optionPlane];
 
         return { compare, position, direction };

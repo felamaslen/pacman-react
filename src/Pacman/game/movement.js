@@ -9,7 +9,7 @@ export function gridDistance(posA, posB) {
 
 export function orderPolarity(direction) {
     const order = (direction < 2) >> 0;
-    const polarity = (-1) ** order;
+    const polarity = (-1) ** (1 - order);
     const plane = direction % 2;
 
     return { order, polarity, plane };
@@ -19,7 +19,7 @@ export function getNewPosition(position, direction, speed, time, toNearestPlane 
     const { order, plane, polarity } = orderPolarity(direction);
 
     const newPosition = position.slice();
-    const movedVector = -polarity * speed * time;
+    const movedVector = polarity * speed * time;
     let movedDistance = Math.abs(movedVector);
 
     const nearestOtherPlane = Math.round(newPosition[1 - plane]);
@@ -34,7 +34,7 @@ export function getNewPosition(position, direction, speed, time, toNearestPlane 
     const trackHit = track.findIndex(limits =>
         position[plane] >= limits[0] &&
         position[plane] <= limits[1] &&
-        polarity * newPosition[plane] < polarity * limits[order]
+        polarity * newPosition[plane] > polarity * limits[order]
     );
 
     let collision = false;
@@ -89,15 +89,15 @@ export function getChangedVector(oldPosition, newPosition, oldDirection, newDire
         const trackHit = track.findIndex(limits =>
             newPosition[newPlane] >= limits[0] &&
             newPosition[newPlane] <= limits[1] &&
-            (1 - newOrder) * newPosition[newPlane] >= (limits[0] + polarity) * (1 - newOrder) &&
-            newOrder * newPosition[newPlane] <= (limits[1] + polarity) * newOrder
+            (1 - newOrder) * newPosition[newPlane] >= (limits[0] - polarity) * (1 - newOrder) &&
+            newOrder * newPosition[newPlane] <= (limits[1] - polarity) * newOrder
         );
 
         if (trackHit > -1) {
             const changedVector = newPosition.slice();
 
             changedVector[oldPlane] = trackTo;
-            changedVector[newPlane] -= polarity * (movedDistance - movedDistanceBeforeTurn);
+            changedVector[newPlane] += polarity * (movedDistance - movedDistanceBeforeTurn);
 
             return changedVector;
         }

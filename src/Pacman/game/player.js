@@ -7,8 +7,8 @@ function getEatenFood(food, player, newPosition) {
 
     return food.findIndex(({ position, eaten }) => !eaten &&
         position[1 - plane] === player.position[1 - plane] &&
-        polarity * position[plane] <= polarity * player.position[plane] &&
-        polarity * position[plane] >= polarity * newPosition[plane]
+        polarity * position[plane] >= polarity * player.position[plane] &&
+        polarity * position[plane] <= polarity * newPosition[plane]
     );
 }
 
