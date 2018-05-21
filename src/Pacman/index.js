@@ -56,7 +56,7 @@ export default class Pacman extends Component {
         this.setState(result);
 
         clearTimeout(this.timers.animate);
-        this.timers.aniamte = setTimeout(() => this.step(), 25);
+        this.timers.animate = setTimeout(() => this.step(), 25);
     }
     changeDirection(direction) {
         this.setState(changeDirection(this.state, { direction }));
