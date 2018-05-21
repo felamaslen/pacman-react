@@ -7,11 +7,3 @@ export function cssPosition(position, gridSize) {
     };
 }
 
-export function orderPolarity(direction) {
-    const order = (direction < 2) >> 0;
-    const polarity = (-1) ** order;
-    const plane = direction % 2;
-
-    return { order, polarity, plane };
-}
-
