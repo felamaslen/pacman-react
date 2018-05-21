@@ -148,7 +148,6 @@ export default class Monster extends Component {
         super(props);
 
         this.state = {
-            direction: props.direction,
             eatingFlash: 0,
             timerFlash: this.getTimerFlash()
         };
