@@ -59,7 +59,7 @@ function getNextMonsterHomePosition(newPosition, monster, player) {
 
         return {
             position: [newPosition[0], MONSTER_HOME_RANGE[NORTH]],
-            direction: monster.position[0] < player.position[0]
+            direction: !monster.directionBias && monster.position[0] < player.position[0]
                 ? EAST
                 : WEST
         };

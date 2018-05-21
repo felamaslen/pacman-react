@@ -72,7 +72,8 @@ export default function getInitialState() {
                 direction: EAST,
                 live: true,
                 color: 'cyan',
-                position: [10.5, 15]
+                position: [10.5, 15],
+                directionBias: true
             },
             {
                 id: 'monster-orange',
@@ -86,7 +87,8 @@ export default function getInitialState() {
                 direction: NORTH,
                 live: true,
                 color: 'pink',
-                position: [12.5, 17]
+                position: [12.5, 17],
+                directionBias: true
             }
         ],
         food: generateFood(),
