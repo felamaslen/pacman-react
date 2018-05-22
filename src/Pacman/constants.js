@@ -8,6 +8,8 @@ export const COMPASS = [EAST, NORTH, WEST, SOUTH];
 export const BOARD_WIDTH = 28;
 export const BOARD_HEIGHT = 36;
 
+export const PLAYER_RADIUS = 0.8;
+
 export const WALL_COLOUR = '#06f';
 
 export const EATING_TIME_SECONDS = 5;

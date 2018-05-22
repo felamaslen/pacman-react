@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { PLAYER_RADIUS } from '../constants';
 import { cssPosition } from '../helpers';
 import './style.scss';
 
@@ -59,7 +60,7 @@ export default class Player extends Component {
             fill: 'yellow'
         };
 
-        const radius = gridSize * 0.8;
+        const radius = gridSize * PLAYER_RADIUS;
 
         const style = {
             ...cssPosition(position, gridSize),
