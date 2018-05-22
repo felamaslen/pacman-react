@@ -63,36 +63,47 @@ export default function getInitialState() {
             {
                 id: 'monster-red',
                 direction: NORTH,
-                live: true,
-                color: 'red',
-                position: [12.5, 15]
+                startingDirection: NORTH,
+                position: [12.5, 15],
+                startingPosition: [12.5, 15],
+                deadTime: 0,
+                eatingTime: 0,
+                color: 'red'
             },
             {
                 id: 'monster-cyan',
                 direction: EAST,
-                live: true,
-                color: 'cyan',
+                startingDirection: EAST,
                 position: [10.5, 15],
+                startingPosition: [10.5, 15],
+                deadTime: 0,
+                eatingTime: 0,
+                color: 'cyan',
                 directionBias: true
             },
             {
                 id: 'monster-orange',
                 direction: WEST,
-                live: true,
-                color: 'darkorange',
-                position: [14.5, 15]
+                startingDirection: WEST,
+                position: [14.5, 15],
+                startingPosition: [14.5, 15],
+                deadTime: 0,
+                eatingTime: 0,
+                color: 'darkorange'
             },
             {
                 id: 'monster-pink',
                 direction: NORTH,
-                live: true,
-                color: 'pink',
+                startingDirection: NORTH,
                 position: [12.5, 17],
+                startingPosition: [12.5, 17],
+                deadTime: 0,
+                eatingTime: 0,
+                color: 'pink',
                 directionBias: true
             }
         ],
-        food: generateFood(),
-        eating: false
+        food: generateFood()
     };
 }
 

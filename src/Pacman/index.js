@@ -51,19 +51,19 @@ export default class Pacman extends Component {
         clearTimeout(this.timers.animate);
     }
     step() {
-        const result = animate(this.state, { time: this.state.stepTime + 100 });
+        const result = animate(this.state, { time: Date.now() });
 
         this.setState(result);
 
         clearTimeout(this.timers.animate);
-        this.timers.animate = setTimeout(() => this.step(), 25);
+        this.timers.animate = setTimeout(() => this.step(), 20);
     }
     changeDirection(direction) {
         this.setState(changeDirection(this.state, { direction }));
     }
     render() {
         const monsters = this.state.monsters.map(({ id, ...monster }) => (
-            <Monster key={id} {...this.props} eating={this.state.eating} {...monster} />
+            <Monster key={id} {...this.props} {...monster} />
         ));
 
         return (
