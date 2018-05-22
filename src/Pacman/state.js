@@ -67,6 +67,7 @@ export default function getInitialState() {
                 position: [12.5, 15],
                 startingPosition: [12.5, 15],
                 deadTime: 0,
+                eatingTime: 0,
                 color: 'red'
             },
             {
@@ -76,6 +77,7 @@ export default function getInitialState() {
                 position: [10.5, 15],
                 startingPosition: [10.5, 15],
                 deadTime: 0,
+                eatingTime: 0,
                 color: 'cyan',
                 directionBias: true
             },
@@ -86,6 +88,7 @@ export default function getInitialState() {
                 position: [14.5, 15],
                 startingPosition: [14.5, 15],
                 deadTime: 0,
+                eatingTime: 0,
                 color: 'darkorange'
             },
             {
@@ -95,12 +98,12 @@ export default function getInitialState() {
                 position: [12.5, 17],
                 startingPosition: [12.5, 17],
                 deadTime: 0,
+                eatingTime: 0,
                 color: 'pink',
                 directionBias: true
             }
         ],
-        food: generateFood(),
-        eatingTime: -1
+        food: generateFood()
     };
 }
 

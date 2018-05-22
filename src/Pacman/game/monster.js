@@ -109,7 +109,7 @@ function getAvailableMonsterRoutes({ newPosition, collision, plane, trackTo, mon
     return { availableOptions, distanceFromTrack };
 }
 
-function getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player, eating) {
+function getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player) {
     // determine where to move a monster if it has a decision to make
     const { order, plane } = orderPolarity(monster.direction);
 
@@ -136,13 +136,13 @@ function getNavigatedMonsterVector(newPosition, collision, movedDistance, monste
         movedDistance,
         availableOptions,
         player,
-        eating
+        eating: monster.eatingTime > 0
     });
 
     const distanceFromPlayer = gridDistance(vectors[0].position, player.position);
 
     if (distanceFromPlayer < movedDistance) {
-        if (eating) {
+        if (monster.eatingTime) {
             // monster got eaten
 
             return { deadTime: constants.MONSTER_DEATH_TIME_SECONDS };
@@ -155,7 +155,7 @@ function getNavigatedMonsterVector(newPosition, collision, movedDistance, monste
     return vectors[0];
 }
 
-function getNewMonsterVector(monster, player, eating, time) {
+function getNewMonsterVector(monster, player, time) {
     if (monster.deadTime > time) {
         return {
             ...monster,
@@ -166,6 +166,7 @@ function getNewMonsterVector(monster, player, eating, time) {
         return {
             ...monster,
             deadTime: 0,
+            eatingTime: 0,
             position: monster.startingPosition,
             direction: monster.startingDirection
         };
@@ -173,7 +174,7 @@ function getNewMonsterVector(monster, player, eating, time) {
 
     const isHome = getIsHome(monster);
 
-    const speed = eating
+    const speed = monster.eatingTime
         ? constants.MONSTER_SPEED_RETREAT
         : constants.MONSTER_SPEED_ATTACK;
 
@@ -184,11 +185,11 @@ function getNewMonsterVector(monster, player, eating, time) {
         return getNextMonsterHomePosition(newPosition, monster, player);
     }
 
-    return getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player, eating);
+    return getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player);
 }
 
-function animateMonster(state, time, eating, monster, index) {
-    const { lost, ...monsterVector } = getNewMonsterVector(monster, state.player, eating, time);
+function animateMonster(state, time, monster, index) {
+    const { lost, ...monsterVector } = getNewMonsterVector(monster, state.player, time);
 
     state.monsters[index] = {
         ...monster,
@@ -203,9 +204,7 @@ function animateMonster(state, time, eating, monster, index) {
 }
 
 export function animateMonsters(state, time) {
-    const eating = state.eatingTime > 0;
-
     return state.monsters.reduce((lastState, monster, index) =>
-        animateMonster(lastState, time, eating, monster, index), { ...state });
+        animateMonster(lastState, time, monster, index), { ...state });
 }
 

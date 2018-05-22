@@ -156,7 +156,7 @@ export default class Monster extends Component {
             clearInterval(this.state.timerFlash);
         }
 
-        if (!this.props.eating) {
+        if (!this.props.eatingTime) {
             return null;
         }
 
@@ -165,7 +165,9 @@ export default class Monster extends Component {
         }, 500);
     }
     componentDidUpdate(prevProps) {
-        if (this.props.eating !== prevProps.eating) {
+        if ((this.props.eatingTime > 0 && prevProps.eatingTime === 0) ||
+            (this.props.eatingTime === 0 && prevProps.eatingTime > 0)) {
+
             this.setState({ timerFlash: this.getTimerFlash() });
         }
     }
@@ -174,10 +176,10 @@ export default class Monster extends Component {
     }
     static propTypes = {
         gridSize: PropTypes.number.isRequired,
-        eating: PropTypes.bool.isRequired,
         position: PropTypes.array.isRequired,
         direction: PropTypes.number.isRequired,
         color: PropTypes.string.isRequired,
+        eatingTime: PropTypes.number.isRequired,
         deadTime: PropTypes.number.isRequired
     };
     render() {
@@ -185,8 +187,11 @@ export default class Monster extends Component {
             return null;
         }
 
+        const { eatingTime, ...props } = this.props;
+        const eating = eatingTime > 0;
+
         return (
-            <MonsterIcon {...this.props} {...this.state} />
+            <MonsterIcon eating={eating} {...props} {...this.state} />
         );
     }
 }

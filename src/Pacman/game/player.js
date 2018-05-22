@@ -29,27 +29,39 @@ function getNewPlayerPosition(player, time) {
     return { position: newPosition };
 }
 
+function eatMonsters(state) {
+    return {
+        ...state,
+        monsters: state.monsters.map(monster => ({
+            ...monster,
+            eatingTime: EATING_TIME_SECONDS
+        }))
+    };
+}
+
 export function animatePlayer(state, time) {
     const newVector = getNewPlayerPosition(state.player, time);
     const eatenFoodIndex = getEatenFood(state.food, state.player, newVector.position);
     const food = state.food.slice();
-    let eatingTime = state.eatingTime;
     if (eatenFoodIndex > -1) {
         food[eatenFoodIndex].eaten = true;
-
-        if (food[eatenFoodIndex].big) {
-            eatingTime = EATING_TIME_SECONDS;
-        }
     }
 
-    return {
+    const eating = eatenFoodIndex > -1 && food[eatenFoodIndex].big;
+
+    const nextState = {
         ...state,
         player: {
             ...state.player,
             ...newVector
         },
-        food,
-        eatingTime
+        food
     };
+
+    if (eating) {
+        return eatMonsters(nextState);
+    }
+
+    return nextState;
 }
 
