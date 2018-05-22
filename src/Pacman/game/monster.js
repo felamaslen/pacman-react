@@ -5,11 +5,20 @@ import { gridDistance, orderPolarity, getNewPosition, snapToTrack } from './move
 const MONSTER_SPEED_ATTACK = 2;
 const MONSTER_SPEED_RETREAT = 1.5;
 
+const MONSTER_DEATH_TIME_SECONDS = 3;
+
 const MONSTER_HOME_RANGE = [17, 18, 8, 12];
 const MONSTER_HOME_EXIT_COL = 12.5;
 
 function getAvailableVectors({
-    newPosition, plane, trackTo, distanceFromTrack, movedDistance, player, availableOptions
+    newPosition,
+    plane,
+    trackTo,
+    distanceFromTrack,
+    movedDistance,
+    availableOptions,
+    player,
+    eating
 }) {
     return availableOptions.map(direction => {
         const { polarity: optionPolarity, plane: optionPlane } = orderPolarity(direction);
@@ -32,9 +41,9 @@ function getAvailableVectors({
 
         return { compare, position, direction };
     })
-        .sort(({ compare: posA }, { compare: posB }) =>
+        .sort(({ compare: posA }, { compare: posB }) => (-1) ** (eating >> 0) * (
             gridDistance(posA, player.position) - gridDistance(posB, player.position)
-        )
+        ))
         .map(({ direction, position }) => ({ direction, position }));
 }
 
@@ -108,7 +117,7 @@ function getAvailableMonsterRoutes({ newPosition, collision, plane, trackTo, mon
     return { availableOptions, distanceFromTrack };
 }
 
-function getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player) {
+function getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player, eating) {
     // determine where to move a monster if it has a decision to make
     const { order, plane } = orderPolarity(monster.direction);
 
@@ -128,53 +137,83 @@ function getNavigatedMonsterVector(newPosition, collision, movedDistance, monste
     }
 
     const vectors = getAvailableVectors({
-        newPosition, plane, trackTo, distanceFromTrack, movedDistance, player, availableOptions
+        newPosition,
+        plane,
+        trackTo,
+        distanceFromTrack,
+        movedDistance,
+        availableOptions,
+        player,
+        eating
     });
 
     const distanceFromPlayer = gridDistance(vectors[0].position, player.position);
 
     if (distanceFromPlayer < movedDistance) {
-        // player got eaten
+        if (eating) {
+            // monster got eaten
 
+            return { deadTime: MONSTER_DEATH_TIME_SECONDS };
+        }
+
+        // player got eaten
         return { lost: true };
     }
 
     return vectors[0];
 }
 
-function getNewMonsterVector(monster, player, time) {
+function getNewMonsterVector(monster, player, eating, time) {
+    if (monster.deadTime > time) {
+        return {
+            ...monster,
+            deadTime: monster.deadTime - time
+        };
+    }
+    if (monster.deadTime > 0) {
+        return {
+            ...monster,
+            deadTime: 0,
+            position: monster.startingPosition,
+            direction: monster.startingDirection
+        };
+    }
+
     const isHome = getIsHome(monster);
 
+    const speed = eating
+        ? MONSTER_SPEED_RETREAT
+        : MONSTER_SPEED_ATTACK;
+
     const { newPosition, collision, movedDistance } = getNewPosition(
-        monster.position, monster.direction, MONSTER_SPEED_ATTACK, time, !isHome);
+        monster.position, monster.direction, speed, time, !isHome);
 
     if (isHome) {
         return getNextMonsterHomePosition(newPosition, monster, player);
     }
 
-    return getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player);
+    return getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player, eating);
 }
 
-function animateMonster(state, time, monster, index) {
-    const { lost, ...monsterVector } = getNewMonsterVector(monster, state.player, time);
+function animateMonster(state, time, eating, monster, index) {
+    const { lost, ...monsterVector } = getNewMonsterVector(monster, state.player, eating, time);
 
-    const newMonster = {
+    state.monsters[index] = {
         ...monster,
         ...monsterVector
     };
 
-    const newMonsters = state.monsters.slice();
-    newMonsters[index] = newMonster;
+    if (lost) {
+        state.lost = true;
+    }
 
-    return {
-        ...state,
-        lost: state.lost || Boolean(lost),
-        monsters: newMonsters
-    };
+    return state;
 }
 
 export function animateMonsters(state, time) {
+    const eating = state.eatingTime > 0;
+
     return state.monsters.reduce((lastState, monster, index) =>
-        animateMonster(lastState, time, monster, index), state);
+        animateMonster(lastState, time, eating, monster, index), { ...state });
 }
 

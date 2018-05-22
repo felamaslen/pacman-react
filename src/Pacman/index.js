@@ -63,7 +63,7 @@ export default class Pacman extends Component {
     }
     render() {
         const monsters = this.state.monsters.map(({ id, ...monster }) => (
-            <Monster key={id} {...this.props} eating={this.state.eating > -1} {...monster} />
+            <Monster key={id} {...this.props} eating={this.state.eatingTime > -1} {...monster} />
         ));
 
         return (

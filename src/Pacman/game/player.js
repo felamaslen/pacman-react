@@ -33,12 +33,12 @@ export function animatePlayer(state, time) {
     const newVector = getNewPlayerPosition(state.player, time);
     const eatenFoodIndex = getEatenFood(state.food, state.player, newVector.position);
     const food = state.food.slice();
-    let eating = state.eating;
+    let eatingTime = state.eatingTime;
     if (eatenFoodIndex > -1) {
         food[eatenFoodIndex].eaten = true;
 
         if (food[eatenFoodIndex].big) {
-            eating = EATING_TIME_SECONDS;
+            eatingTime = EATING_TIME_SECONDS;
         }
     }
 
@@ -49,7 +49,7 @@ export function animatePlayer(state, time) {
             ...newVector
         },
         food,
-        eating
+        eatingTime
     };
 }
 

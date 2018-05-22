@@ -139,7 +139,6 @@ MonsterIcon.propTypes = {
     gridSize: PropTypes.number.isRequired,
     position: PropTypes.array.isRequired,
     color: PropTypes.string.isRequired,
-    live: PropTypes.bool.isRequired,
     direction: PropTypes.number.isRequired
 };
 
@@ -179,9 +178,13 @@ export default class Monster extends Component {
         position: PropTypes.array.isRequired,
         direction: PropTypes.number.isRequired,
         color: PropTypes.string.isRequired,
-        live: PropTypes.bool.isRequired
+        deadTime: PropTypes.number.isRequired
     };
     render() {
+        if (this.props.deadTime > 0) {
+            return null;
+        }
+
         return (
             <MonsterIcon {...this.props} {...this.state} />
         );
