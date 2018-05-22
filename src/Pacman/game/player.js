@@ -41,14 +41,18 @@ export function animatePlayer(state, time) {
     const newVector = getNewPlayerPosition(state.player, time);
     const eatenFoodIndex = getEatenFood(state.food, state.player, newVector.position);
     const food = state.food.slice();
+    let scoreDelta = 0;
     if (eatenFoodIndex > -1) {
         food[eatenFoodIndex].eaten = true;
+
+        scoreDelta = 1 + (food[eatenFoodIndex].big >> 0);
     }
 
     const eating = eatenFoodIndex > -1 && food[eatenFoodIndex].big;
 
     const nextState = {
         ...state,
+        score: state.score + scoreDelta,
         player: {
             ...state.player,
             ...newVector
