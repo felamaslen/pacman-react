@@ -4,6 +4,7 @@ import { EAST, NORTH, WEST, SOUTH } from './constants';
 import getInitialState from './state';
 import { animate, changeDirection } from './game';
 import Board from './Board';
+import Scores from './Scores';
 import AllFood from './AllFood';
 import Monster from './Monster';
 import Player from './Player';
@@ -69,6 +70,7 @@ export default class Pacman extends Component {
         return (
             <div className="pacman">
                 <Board {...this.props} />
+                <Scores score={this.state.score} lost={this.state.lost} />
                 <AllFood {...this.props} food={this.state.food} />
                 {monsters}
                 <Player {...this.props} {...this.state.player} />
