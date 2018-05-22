@@ -12,3 +12,11 @@ export const WALL_COLOUR = '#06f';
 
 export const EATING_TIME_SECONDS = 10;
 
+export const MONSTER_SPEED_ATTACK = 2;
+export const MONSTER_SPEED_RETREAT = 1.5;
+
+export const MONSTER_DEATH_TIME_SECONDS = 3;
+export const MONSTER_HOME_RANGE = [17, 18, 8, 12];
+export const MONSTER_HOME_EXIT_COL = 12.5;
+
+

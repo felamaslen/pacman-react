@@ -1,14 +1,6 @@
-import { EAST, NORTH, WEST, SOUTH } from '../constants';
+import * as constants from '../constants';
 import tracks from './tracks';
 import { gridDistance, orderPolarity, getNewPosition, snapToTrack } from './movement';
-
-const MONSTER_SPEED_ATTACK = 2;
-const MONSTER_SPEED_RETREAT = 1.5;
-
-const MONSTER_DEATH_TIME_SECONDS = 3;
-
-const MONSTER_HOME_RANGE = [17, 18, 8, 12];
-const MONSTER_HOME_EXIT_COL = 12.5;
 
 function getAvailableVectors({
     newPosition,
@@ -48,29 +40,29 @@ function getAvailableVectors({
 }
 
 function getNextMonsterHomePosition(newPosition, monster, player) {
-    if ((monster.direction === EAST &&
-        monster.position[0] < MONSTER_HOME_EXIT_COL &&
-        newPosition[0] >= MONSTER_HOME_EXIT_COL) ||
+    if ((monster.direction === constants.EAST &&
+        monster.position[0] < constants.MONSTER_HOME_EXIT_COL &&
+        newPosition[0] >= constants.MONSTER_HOME_EXIT_COL) ||
 
-        (monster.direction === WEST &&
-        monster.position[0] > MONSTER_HOME_EXIT_COL &&
-        newPosition[0] <= MONSTER_HOME_EXIT_COL)
+        (monster.direction === constants.WEST &&
+        monster.position[0] > constants.MONSTER_HOME_EXIT_COL &&
+        newPosition[0] <= constants.MONSTER_HOME_EXIT_COL)
     ) {
 
         return {
-            position: [MONSTER_HOME_EXIT_COL, newPosition[1]],
-            direction: NORTH
+            position: [constants.MONSTER_HOME_EXIT_COL, newPosition[1]],
+            direction: constants.NORTH
         };
     }
-    if (monster.direction === NORTH &&
-        monster.position[1] < MONSTER_HOME_RANGE[NORTH] &&
-        newPosition[1] >= MONSTER_HOME_RANGE[NORTH]) {
+    if (monster.direction === constants.NORTH &&
+        monster.position[1] < constants.MONSTER_HOME_RANGE[constants.NORTH] &&
+        newPosition[1] >= constants.MONSTER_HOME_RANGE[constants.NORTH]) {
 
         return {
-            position: [newPosition[0], MONSTER_HOME_RANGE[NORTH]],
+            position: [newPosition[0], constants.MONSTER_HOME_RANGE[constants.NORTH]],
             direction: !monster.directionBias && monster.position[0] < player.position[0]
-                ? EAST
-                : WEST
+                ? constants.EAST
+                : constants.WEST
         };
     }
 
@@ -78,10 +70,10 @@ function getNextMonsterHomePosition(newPosition, monster, player) {
 }
 
 function getIsHome(monster) {
-    return monster.position[0] > MONSTER_HOME_RANGE[WEST] &&
-        monster.position[0] < MONSTER_HOME_RANGE[EAST] &&
-        monster.position[1] > MONSTER_HOME_RANGE[SOUTH] &&
-        monster.position[1] < MONSTER_HOME_RANGE[NORTH];
+    return monster.position[0] > constants.MONSTER_HOME_RANGE[constants.WEST] &&
+        monster.position[0] < constants.MONSTER_HOME_RANGE[constants.EAST] &&
+        monster.position[1] > constants.MONSTER_HOME_RANGE[constants.SOUTH] &&
+        monster.position[1] < constants.MONSTER_HOME_RANGE[constants.NORTH];
 }
 
 function getAvailableMonsterRoutes({ newPosition, collision, plane, trackTo, monster }) {
@@ -96,13 +88,13 @@ function getAvailableMonsterRoutes({ newPosition, collision, plane, trackTo, mon
         const options = [null, null];
         if (passedTrack[0] < newPosition[1 - plane]) {
             options[0] = plane === 0
-                ? SOUTH
-                : WEST;
+                ? constants.SOUTH
+                : constants.WEST;
         }
         if (passedTrack[1] > newPosition[1 - plane]) {
             options[1] = plane === 0
-                ? NORTH
-                : EAST;
+                ? constants.NORTH
+                : constants.EAST;
         }
 
         availableOptions = options.filter(item => item !== null);
@@ -153,7 +145,7 @@ function getNavigatedMonsterVector(newPosition, collision, movedDistance, monste
         if (eating) {
             // monster got eaten
 
-            return { deadTime: MONSTER_DEATH_TIME_SECONDS };
+            return { deadTime: constants.MONSTER_DEATH_TIME_SECONDS };
         }
 
         // player got eaten
@@ -182,8 +174,8 @@ function getNewMonsterVector(monster, player, eating, time) {
     const isHome = getIsHome(monster);
 
     const speed = eating
-        ? MONSTER_SPEED_RETREAT
-        : MONSTER_SPEED_ATTACK;
+        ? constants.MONSTER_SPEED_RETREAT
+        : constants.MONSTER_SPEED_ATTACK;
 
     const { newPosition, collision, movedDistance } = getNewPosition(
         monster.position, monster.direction, speed, time, !isHome);
