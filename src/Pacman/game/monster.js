@@ -193,8 +193,8 @@ function getNewMonsterVector(monster, player, time) {
     };
 }
 
-function animateMonster(state, time, monster, index) {
-    const { lost, ...monsterVector } = getNewMonsterVector(monster, state.player, time);
+function animateMonster(state, time, player, monster, index) {
+    const { lost, ...monsterVector } = getNewMonsterVector(monster, player, time);
 
     const newMonsters = state.monsters.slice();
 
@@ -210,8 +210,8 @@ function animateMonster(state, time, monster, index) {
     return { ...state, monsters: newMonsters };
 }
 
-export function animateMonsters(state, time) {
+export function animateMonsters(state, time, player) {
     return state.monsters.reduce((lastState, monster, index) =>
-        animateMonster(lastState, time, monster, index), state);
+        animateMonster(lastState, time, player, monster, index), state);
 }
 

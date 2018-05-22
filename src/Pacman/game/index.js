@@ -20,7 +20,7 @@ export function animate(state, { time = Date.now() } = {}) {
 
     const statePlayerAnimated = animatePlayer({ ...state, stepTime: time }, timeSeconds);
 
-    const stateMonstersAnimated = animateMonsters(statePlayerAnimated, timeSeconds);
+    const stateMonstersAnimated = animateMonsters(statePlayerAnimated, timeSeconds, state.player);
 
     const stateEatenMonsters = collectEatenMonsterScores(stateMonstersAnimated, state);
 

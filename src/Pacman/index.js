@@ -52,7 +52,7 @@ export default class Pacman extends Component {
         clearTimeout(this.timers.animate);
     }
     step() {
-        const result = animate(this.state, { time: Date.now() });
+        const result = animate(this.state);
 
         this.setState(result);
 
