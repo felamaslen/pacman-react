@@ -10,7 +10,7 @@ export const BOARD_HEIGHT = 36;
 
 export const WALL_COLOUR = '#06f';
 
-export const EATING_TIME_SECONDS = 10;
+export const EATING_TIME_SECONDS = 5;
 
 export const MONSTER_SPEED_ATTACK = 5;
 export const MONSTER_SPEED_RETREAT = 3;

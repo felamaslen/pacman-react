@@ -172,6 +172,8 @@ function getNewMonsterVector(monster, player, time) {
         };
     }
 
+    const eatingTime = Math.max(0, monster.eatingTime - time);
+
     const isHome = getIsHome(monster);
 
     const speed = monster.eatingTime
@@ -185,7 +187,10 @@ function getNewMonsterVector(monster, player, time) {
         return getNextMonsterHomePosition(newPosition, monster, player);
     }
 
-    return getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player);
+    return {
+        ...getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player),
+        eatingTime
+    };
 }
 
 function animateMonster(state, time, monster, index) {
