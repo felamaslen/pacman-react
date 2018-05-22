@@ -196,20 +196,22 @@ function getNewMonsterVector(monster, player, time) {
 function animateMonster(state, time, monster, index) {
     const { lost, ...monsterVector } = getNewMonsterVector(monster, state.player, time);
 
-    state.monsters[index] = {
+    const newMonsters = state.monsters.slice();
+
+    newMonsters[index] = {
         ...monster,
         ...monsterVector
     };
 
     if (lost) {
-        state.lost = true;
+        return { ...state, lost: true };
     }
 
-    return state;
+    return { ...state, monsters: newMonsters };
 }
 
 export function animateMonsters(state, time) {
     return state.monsters.reduce((lastState, monster, index) =>
-        animateMonster(lastState, time, monster, index), { ...state });
+        animateMonster(lastState, time, monster, index), state);
 }
 
