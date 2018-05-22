@@ -1,7 +1,5 @@
-import { EATING_TIME_SECONDS } from '../constants';
+import { PLAYER_SPEED, EATING_TIME_SECONDS } from '../constants';
 import { getNewPosition, getChangedVector, orderPolarity } from './movement';
-
-const PLAYER_SPEED = 2; // dots per second
 
 function getEatenFood(food, player, newPosition) {
     const { plane, polarity } = orderPolarity(player.direction);
