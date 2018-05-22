@@ -141,7 +141,7 @@ function getNavigatedMonsterVector(newPosition, collision, movedDistance, monste
 
     const distanceFromPlayer = gridDistance(vectors[0].position, player.position);
 
-    if (distanceFromPlayer < movedDistance) {
+    if (distanceFromPlayer < movedDistance * 2) {
         if (monster.eatingTime) {
             // monster got eaten
 
