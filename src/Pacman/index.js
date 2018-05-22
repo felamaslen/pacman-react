@@ -73,7 +73,7 @@ export default class Pacman extends Component {
                 <Scores score={this.state.score} lost={this.state.lost} />
                 <AllFood {...this.props} food={this.state.food} />
                 {monsters}
-                <Player {...this.props} {...this.state.player} />
+                <Player {...this.props} {...this.state.player} lost={this.state.lost} />
             </div>
         );
     }

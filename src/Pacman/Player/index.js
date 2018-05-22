@@ -4,7 +4,18 @@ import { PLAYER_RADIUS } from '../constants';
 import { cssPosition } from '../helpers';
 import './style.scss';
 
+const ANIMATION_SPEED = 30;
+
 function pacmanPath(radius, angle, offset) {
+    if (!angle) {
+        return [
+            `M0,${radius}`,
+            `A${radius},${radius} 0 1 0 ${radius * 2},${radius}`,
+            `A${radius},${radius} 0 1 0 0,${radius}`
+        ]
+            .join(' ');
+    }
+
     const offsetX = radius * Math.cos(angle / 2);
     const offsetY = radius * Math.sin(angle / 2);
 
@@ -18,11 +29,13 @@ function pacmanPath(radius, angle, offset) {
     const biteX2 = offsetX * m00 + offsetY * m01;
     const biteY2 = -offsetX * m01 + offsetY * m00;
 
+    const arcFlag = (angle < Math.PI) >> 0;
+
     return [
         `M${radius},${radius}`,
         `L${radius + biteX1},${radius + biteY1}`,
         `A${radius},${radius}`,
-        `0 1 0`,
+        `0 ${arcFlag} 0`,
         `${radius + biteX2},${radius + biteY2}`,
         `L${radius},${radius}`
     ]
@@ -34,26 +47,45 @@ export default class Player extends Component {
         super(props);
 
         this.state = {
-            angle: 1
+            angle: 1,
+            timerBite: null,
+            timerLose: null
         };
 
         this.startTime = Date.now();
-        this.timer = null;
     }
     componentDidMount() {
-        if (this.props.animate) {
-            this.timer = setInterval(() => {
-                this.setState({
-                    angle: 1 + 0.5 * Math.sin((Date.now() - this.startTime) / 50)
-                });
-            }, 30);
-        }
+        this.setState({
+            timerBite: setInterval(() => this.setState({
+                angle: 1 + 0.5 * Math.sin((Date.now() - this.startTime) / 50)
+            }), ANIMATION_SPEED)
+        });
     }
     componentWillUnmount() {
-        clearInterval(this.timer);
+        clearInterval(this.state.timerBite);
+        clearTimeout(this.state.timerLose);
+    }
+    onLoseAnimation() {
+        if (this.state.angle < Math.PI * 2) {
+            return setTimeout(() => {
+                this.setState({ angle: Math.min(Math.PI * 2, this.state.angle + 0.1) });
+
+                this.onLoseAnimation();
+            }, ANIMATION_SPEED);
+        }
+
+        return null;
+    }
+    componentDidUpdate(prevProps) {
+        if (!prevProps.lost && this.props.lost) {
+            clearInterval(this.state.timerBite);
+            clearTimeout(this.state.timerLose);
+
+            this.setState({ angle: 0, timerLose: this.onLoseAnimation() });
+        }
     }
     render() {
-        const { gridSize, position, direction } = this.props;
+        const { gridSize, lost, position, direction } = this.props;
 
         const pathProps = {
             stroke: 'none',
@@ -70,9 +102,13 @@ export default class Player extends Component {
             marginTop: -radius
         };
 
+        const offset = lost
+            ? 1
+            : direction;
+
         return (
             <svg className="pacman-player" style={style}>
-                <path d={pacmanPath(radius, this.state.angle, direction)} {...pathProps} />
+                <path d={pacmanPath(radius, this.state.angle, offset)} {...pathProps} />
             </svg>
         );
     }
@@ -81,6 +117,7 @@ export default class Player extends Component {
 Player.propTypes = {
     animate: PropTypes.bool,
     gridSize: PropTypes.number.isRequired,
+    lost: PropTypes.bool.isRequired,
     position: PropTypes.array.isRequired,
     direction: PropTypes.number.isRequired
 };
