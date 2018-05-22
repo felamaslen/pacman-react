@@ -10,6 +10,7 @@
         "eslint:recommended",
         "plugin:react/recommended"
     ],
+    "parser": "babel-eslint",
     "parserOptions": {
         "ecmaVersion": 8,
         "ecmaFeatures": {
@@ -20,7 +21,8 @@
         "sourceType": "module"
     },
     "plugins": [
-        "react"
+        "react",
+        "babel"
     ],
     "rules": {
         "accessor-pairs": "error",
@@ -41,6 +43,7 @@
                 "before": true
             }
         ],
+        "babel/semi": 1,
         "block-scoped-var": "error",
         "block-spacing": "error",
         "camelcase": "error",
