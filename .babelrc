@@ -1,0 +1,45 @@
+{
+    "env": {
+      "include": [
+        "transform-class-properties"
+      ],
+      "production": {
+        "presets": [
+          "react",
+          [
+            "env",
+            {
+              "targets": {
+                "browsers": [
+                  "last 2 versions",
+                  "ie >= 10"
+                ]
+              }
+            }
+          ],
+          "stage-0"
+        ]
+      },
+      "development": {
+        "presets": [
+          "react",
+          "stage-0"
+        ],
+        "sourceMaps": "inline"
+      },
+      "test": {
+        "presets": [
+          "react",
+          [
+            "env",
+            {
+              "targets": {
+                "node": "8"
+              }
+            }
+          ],
+          "stage-0"
+        ]
+      }
+    }
+}
