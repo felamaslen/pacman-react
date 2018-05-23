@@ -33,3 +33,11 @@ render(<Pacman />, document.getElementById('root'));
 
 Note that you will need a loader to handle sass files with an `scss` extension. Webpack with `sass-loader` should suffice.
 
+## Development
+
+To run a development server:
+
+- `npm run dev`
+
+This has hot module replacement so you can work on files in the `src/Pacman` directory and they should be updated on the fly.
+
