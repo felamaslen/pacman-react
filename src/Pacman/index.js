@@ -42,8 +42,10 @@ export default class Pacman extends Component {
         window.addEventListener('keydown', this.onKey);
 
         this.timers.start = setTimeout(() => {
+            this.setState({ stepTime: Date.now() });
+
             this.step();
-        }, 3000 * (this.props.animate >> 0));
+        }, 3000);
     }
     componentWillUnmount() {
         window.removeEventListener('keydown', this.onKey);
@@ -63,24 +65,28 @@ export default class Pacman extends Component {
         this.setState(changeDirection(this.state, { direction }));
     }
     render() {
+        const { onEnd, ...otherProps } = this.props;
+
+        const props = { gridSize: 12, ...otherProps };
+
         const monsters = this.state.monsters.map(({ id, ...monster }) => (
-            <Monster key={id} {...this.props} {...monster} />
+            <Monster key={id} {...props} {...monster} />
         ));
 
         return (
             <div className="pacman">
-                <Board {...this.props} />
+                <Board {...props} />
                 <Scores score={this.state.score} lost={this.state.lost} />
-                <AllFood {...this.props} food={this.state.food} />
+                <AllFood {...props} food={this.state.food} />
                 {monsters}
-                <Player {...this.props} {...this.state.player} lost={this.state.lost} />
+                <Player {...props} {...this.state.player} lost={this.state.lost} onEnd={onEnd} />
             </div>
         );
     }
 }
 
 Pacman.propTypes = {
-    animate: PropTypes.bool,
-    gridSize: PropTypes.number.isRequired
+    gridSize: PropTypes.number.isRequired,
+    onEnd: PropTypes.func
 };
 

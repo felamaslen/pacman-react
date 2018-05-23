@@ -180,17 +180,24 @@ function getNewMonsterVector(monster, player, time) {
         ? constants.MONSTER_SPEED_RETREAT
         : constants.MONSTER_SPEED_ATTACK;
 
-    const { newPosition, collision, movedDistance } = getNewPosition(
-        monster.position, monster.direction, speed, time, !isHome);
+    try {
+        const { newPosition, collision, movedDistance } = getNewPosition(
+            monster.position, monster.direction, speed, time, !isHome);
 
-    if (isHome) {
-        return getNextMonsterHomePosition(newPosition, monster, player);
+        if (isHome) {
+            return getNextMonsterHomePosition(newPosition, monster, player);
+        }
+
+        return {
+            ...getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player),
+            eatingTime
+        };
     }
+    catch (err) {
+        // wrapped or something
 
-    return {
-        ...getNavigatedMonsterVector(newPosition, collision, movedDistance, monster, player),
-        eatingTime
-    };
+        return {};
+    }
 }
 
 function animateMonster(state, time, player, monster, index) {

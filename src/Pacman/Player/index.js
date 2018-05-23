@@ -68,10 +68,15 @@ export default class Player extends Component {
     onLoseAnimation() {
         if (this.state.angle < Math.PI * 2) {
             return setTimeout(() => {
-                this.setState({ angle: Math.min(Math.PI * 2, this.state.angle + 0.1) });
-
-                this.onLoseAnimation();
+                this.setState({
+                    angle: Math.min(Math.PI * 2, this.state.angle + 0.1),
+                    timerLose: this.onLoseAnimation()
+                });
             }, ANIMATION_SPEED);
+        }
+
+        if (this.props.onEnd) {
+            setImmediate(() => this.props.onEnd());
         }
 
         return null;
@@ -119,6 +124,7 @@ Player.propTypes = {
     gridSize: PropTypes.number.isRequired,
     lost: PropTypes.bool.isRequired,
     position: PropTypes.array.isRequired,
-    direction: PropTypes.number.isRequired
+    direction: PropTypes.number.isRequired,
+    onEnd: PropTypes.func
 };
 

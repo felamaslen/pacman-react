@@ -85,6 +85,9 @@ export function getChangedVector(oldPosition, newPosition, oldDirection, newDire
         const { order: newOrder, plane: newPlane, polarity } = orderPolarity(newDirection);
 
         const track = tracks[newPlane][trackTo];
+        if (!track) {
+            return null;
+        }
 
         const trackHit = track.findIndex(limits =>
             newPosition[newPlane] >= limits[0] &&

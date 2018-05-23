@@ -11,20 +11,27 @@ function getEatenFood(food, player, newPosition) {
     );
 }
 
-function getNewPlayerPosition(player, time) {
-    const { newPosition, movedDistance } = getNewPosition(player.position, player.direction,
-        PLAYER_SPEED, time);
+function getNewPlayerVector(player, time) {
+    try {
+        const { newPosition, movedDistance } = getNewPosition(player.position, player.direction,
+            PLAYER_SPEED, time);
 
-    if (player.nextDirection !== player.direction) {
-        const changedVector = getChangedVector(player.position, newPosition,
-            player.direction, player.nextDirection, movedDistance);
+        if (player.nextDirection !== player.direction) {
+            const changedVector = getChangedVector(player.position, newPosition,
+                player.direction, player.nextDirection, movedDistance);
 
-        if (changedVector) {
-            return { position: changedVector, direction: player.nextDirection };
+            if (changedVector) {
+                return { position: changedVector, direction: player.nextDirection };
+            }
         }
-    }
 
-    return { position: newPosition };
+        return { position: newPosition };
+    }
+    catch (err) {
+        // wrapped
+
+        return {};
+    }
 }
 
 function eatMonsters(state) {
@@ -38,7 +45,7 @@ function eatMonsters(state) {
 }
 
 export function animatePlayer(state, time) {
-    const newVector = getNewPlayerPosition(state.player, time);
+    const newVector = getNewPlayerVector(state.player, time);
     const eatenFoodIndex = getEatenFood(state.food, state.player, newVector.position);
     const food = state.food.slice();
     let scoreDelta = 0;
