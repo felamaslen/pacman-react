@@ -4,7 +4,7 @@
   "description": "Pacman game written as a React component",
   "main": "index.js",
   "scripts": {
-    "build": "NODE_ENV=production webpack --mode production",
+    "build": "rsync -av --exclude '*.js' src/Pacman/ dist/ && BABEL_ENV=production babel src/Pacman --out-dir dist",
     "dev": "NODE_ENV=development webpack-dev-server --mode development --hot",
     "test": "NODE_ENV=test mocha --require babel-register \"test/**/*.spec.js\"",
     "lint": "eslint test src"
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/felamaslen/pacman-react#readme",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-eslint": "^8.0.0",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.7.0",
@@ -33,7 +34,6 @@
     "eslint-plugin-react": "^7.8.2",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
-    "mini-css-extract-plugin": "^0.4.0",
     "node-sass": "^4.9.0",
     "react-hot-loader": "^4.2.0",
     "sass-loader": "^7.0.1",
