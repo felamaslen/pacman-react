@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "rsync -av --exclude '*.js' src/Pacman/ dist/ && BABEL_ENV=production babel src/Pacman --out-dir dist",
+    "prepublish": "npm run build",
     "dev": "NODE_ENV=development webpack-dev-server --mode development --hot",
     "test": "NODE_ENV=test mocha --require babel-register \"test/**/*.spec.js\"",
     "lint": "eslint test src"
