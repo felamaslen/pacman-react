@@ -76,7 +76,11 @@ export default class Player extends Component {
         }
 
         if (this.props.onEnd) {
-            setImmediate(() => this.props.onEnd());
+            if(this.props.won) {
+                setImmediate(() => this.props.onEnd("WON"));
+            } else {
+                setImmediate(() => this.props.onEnd("LOST"));
+            }
         }
 
         return null;
@@ -107,7 +111,7 @@ export default class Player extends Component {
             marginTop: -radius
         };
 
-        const offset = lost || won
+        const offset = (lost || won)
             ? 1
             : direction;
 

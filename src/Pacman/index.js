@@ -65,7 +65,7 @@ export default class Pacman extends Component {
         this.setState(changeDirection(this.state, { direction }));
     }
     render() {
-        const { onEnd, ...otherProps } = this.props;
+        const { onEnd, onWonEnd, ...otherProps } = this.props;
 
         const props = { gridSize: 12, ...otherProps };
 
@@ -79,11 +79,7 @@ export default class Pacman extends Component {
         const foodComponent = this.state.won ?
             null :
             <div>
-                <AllFood {...props} food={this.state.food} onFoodEnd={() => {
-                    if (!this.state.won) {
-                        this.setState({ won: true })
-                    }
-                }} />
+                <AllFood {...props} food={this.state.food} onFoodEnd={() => this.setState({ won: true })} />
                 {monsters}
             </div>
 
@@ -92,7 +88,9 @@ export default class Pacman extends Component {
                 <Board {...props} />
                 <Scores score={this.state.score} lost={this.state.lost} won={this.state.won} />
                 {foodComponent}
-                <Player {...props} {...this.state.player} lost={this.state.lost} won={this.state.won} onEnd={() => console.log("END")} />
+                <Player {...props} {...this.state.player} lost={this.state.lost} won={this.state.won} onEnd={(state) =>
+                    onEnd({ message: state, score: this.state.score })
+                } />
             </div>
         );
     }

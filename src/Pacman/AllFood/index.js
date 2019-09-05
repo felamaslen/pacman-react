@@ -8,8 +8,8 @@ export default function AllFood({ food, onFoodEnd, ...props }) {
         .map(({ key, ...item }) => (
             <Food key={key} {...item} {...props} />
         ));
-        console.log(items.length);
-    if(items.length < 1) {
+
+    if (items.length < 240) {
         onFoodEnd();
     }
 
