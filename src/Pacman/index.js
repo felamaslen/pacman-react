@@ -73,13 +73,26 @@ export default class Pacman extends Component {
             <Monster key={id} {...props} {...monster} />
         ));
 
+        /**
+         * Render null if user won, otherwise render food, monsters and player
+         */
+        const gameComponents = this.state.won ?
+            null :
+            <div>
+                <AllFood {...props} food={this.state.food} onFoodEnd={() => {
+                    if (!this.state.won) {
+                        this.setState({ won: true })
+                    }
+                }} />
+                {monsters}
+                <Player {...props} {...this.state.player} lost={this.state.lost} won={this.state.won} onEnd={onEnd} />
+            </div>
+
         return (
             <div className="pacman">
                 <Board {...props} />
-                <Scores score={this.state.score} lost={this.state.lost} />
-                <AllFood {...props} food={this.state.food} />
-                {monsters}
-                <Player {...props} {...this.state.player} lost={this.state.lost} onEnd={onEnd} />
+                <Scores score={this.state.score} lost={this.state.lost} won={this.state.won} />
+                {gameComponents}
             </div>
         );
     }

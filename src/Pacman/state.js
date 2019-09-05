@@ -60,6 +60,7 @@ export default function getInitialState() {
             lives: 3
         },
         lost: false,
+        won: false,
         monsters: [
             {
                 id: 'monster-red',
