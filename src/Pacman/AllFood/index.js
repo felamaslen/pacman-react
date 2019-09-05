@@ -9,7 +9,7 @@ export default function AllFood({ food, onFoodEnd, ...props }) {
             <Food key={key} {...item} {...props} />
         ));
 
-    if (items.length < 240) {
+    if (items.length < 1) {
         onFoodEnd();
     }
 
