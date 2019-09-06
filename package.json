@@ -1,6 +1,6 @@
 {
   "name": "pacman-react",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Pacman game written as a React component",
   "main": "index.js",
   "scripts": {
