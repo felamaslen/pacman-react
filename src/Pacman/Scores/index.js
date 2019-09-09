@@ -1,25 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { WON } from '../constants';
 import './style.scss';
 
 export default function Scores({ score, ended }) {
     let gameOver = null;
 
-    switch(ended) {
-        case 'WON': {
-            gameOver = (
-                <span className="game-over">{'Congratulations, you won!'}</span>
-            );
-            break;
-        }
-        case 'LOST': {
-            gameOver = (
-                <span className="game-over">{'Game over!'}</span>
-            );
-            break;
-        }
-        default:
-            break;
+    if (ended) {
+        gameOver = (
+            <span className="game-over">
+                {ended === WON ? 'Congratulations, you won!' : 'Game over'}
+            </span>
+        );
     }
 
     return (

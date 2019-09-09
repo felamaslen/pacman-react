@@ -75,14 +75,14 @@ export default class Player extends Component {
             }, ANIMATION_SPEED);
         }
 
-        if (this.props.onEnd && this.props.ended) {
+        if (this.props.onEnd) {
             setImmediate(() => this.props.onEnd(this.props.ended));
         }
 
         return null;
     }
     componentDidUpdate(prevProps) {
-        if (!prevProps.ended && (this.props.ended === 'WON' || this.props.ended === 'LOST')) {
+        if (!prevProps.ended && this.props.ended) {
             clearInterval(this.state.timerBite);
             clearTimeout(this.state.timerLose);
 

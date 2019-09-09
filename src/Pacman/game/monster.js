@@ -149,7 +149,7 @@ function getNavigatedMonsterVector(newPosition, collision, movedDistance, monste
         }
 
         // player got eaten
-        return { ended: 'LOST' };
+        return { ended: constants.LOST };
     }
 
     return vectors[0];
@@ -211,7 +211,7 @@ function animateMonster(state, time, player, monster, index) {
     };
 
     if (ended) {
-        return { ...state, ended: "LOST" };
+        return { ...state, ended: constants.LOST };
     }
 
     return { ...state, monsters: newMonsters };
