@@ -2,19 +2,24 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './style.scss';
 
-export default function Scores({ score, lost, won }) {
+export default function Scores({ score, ended }) {
     let gameOver = null;
 
-    if (lost) {
-        gameOver = (
-            <span className="game-over">{'Game over!'}</span>
-        );
-    }
-
-    if (won) {
-        gameOver = (
-            <span className="game-over">{'Congratulations, you won!'}</span>
-        );
+    switch(ended) {
+        case 'WON': {
+            gameOver = (
+                <span className="game-over">{'Congratulations, you won!'}</span>
+            );
+            break;
+        }
+        case 'LOST': {
+            gameOver = (
+                <span className="game-over">{'Game over!'}</span>
+            );
+            break;
+        }
+        default:
+            break;
     }
 
     return (
@@ -28,7 +33,7 @@ export default function Scores({ score, lost, won }) {
 }
 
 Scores.propTypes = {
-    lost: PropTypes.bool.isRequired,
+    ended: PropTypes.string.isRequired,
     score: PropTypes.number.isRequired
 };
 

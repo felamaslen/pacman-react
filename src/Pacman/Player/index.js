@@ -75,18 +75,14 @@ export default class Player extends Component {
             }, ANIMATION_SPEED);
         }
 
-        if (this.props.onEnd) {
-            if(this.props.won) {
-                setImmediate(() => this.props.onEnd("WON"));
-            } else {
-                setImmediate(() => this.props.onEnd("LOST"));
-            }
+        if (this.props.onEnd && this.props.ended) {
+            setImmediate(() => this.props.onEnd(this.props.ended));
         }
 
         return null;
     }
     componentDidUpdate(prevProps) {
-        if ((!prevProps.lost && this.props.lost) || (!prevProps.won && this.props.won)) {
+        if (!prevProps.ended && (this.props.ended === 'WON' || this.props.ended === 'LOST')) {
             clearInterval(this.state.timerBite);
             clearTimeout(this.state.timerLose);
 
@@ -94,7 +90,7 @@ export default class Player extends Component {
         }
     }
     render() {
-        const { gridSize, lost, position, direction, won } = this.props;
+        const { gridSize, ended, position, direction } = this.props;
 
         const pathProps = {
             stroke: 'none',
@@ -111,7 +107,7 @@ export default class Player extends Component {
             marginTop: -radius
         };
 
-        const offset = (lost || won)
+        const offset = ended
             ? 1
             : direction;
 
@@ -126,7 +122,7 @@ export default class Player extends Component {
 Player.propTypes = {
     animate: PropTypes.bool,
     gridSize: PropTypes.number.isRequired,
-    lost: PropTypes.bool.isRequired,
+    ended: PropTypes.string.isRequired,
     position: PropTypes.array.isRequired,
     direction: PropTypes.number.isRequired,
     onEnd: PropTypes.func

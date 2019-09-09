@@ -65,7 +65,7 @@ export default class Pacman extends Component {
         this.setState(changeDirection(this.state, { direction }));
     }
     render() {
-        const { onEnd, onWonEnd, ...otherProps } = this.props;
+        const { onEnd, ...otherProps } = this.props;
 
         const props = { gridSize: 12, ...otherProps };
 
@@ -76,21 +76,19 @@ export default class Pacman extends Component {
         /**
          * Render null if user won, otherwise render food, monsters and player
          */
-        const foodComponent = this.state.won ?
+        const foodComponent = this.state.ended ?
             null :
             <div>
-                <AllFood {...props} food={this.state.food} onFoodEnd={() => this.setState({ won: true })} />
+                <AllFood {...props} food={this.state.food} onEnd={() => this.setState({ ended: 'WON' })} />
                 {monsters}
             </div>
 
         return (
             <div className="pacman">
                 <Board {...props} />
-                <Scores score={this.state.score} lost={this.state.lost} won={this.state.won} />
+                <Scores score={this.state.score} ended={this.state.ended} />
                 {foodComponent}
-                <Player {...props} {...this.state.player} lost={this.state.lost} won={this.state.won} onEnd={(state) =>
-                    onEnd({ message: state, score: this.state.score })
-                } />
+                <Player {...props} {...this.state.player} ended={this.state.ended} onEnd={(state) => onEnd({ state, score: this.state.score })} />
             </div>
         );
     }

@@ -149,7 +149,7 @@ function getNavigatedMonsterVector(newPosition, collision, movedDistance, monste
         }
 
         // player got eaten
-        return { lost: true };
+        return { ended: 'LOST' };
     }
 
     return vectors[0];
@@ -201,7 +201,7 @@ function getNewMonsterVector(monster, player, time) {
 }
 
 function animateMonster(state, time, player, monster, index) {
-    const { lost, ...monsterVector } = getNewMonsterVector(monster, player, time);
+    const { ended, ...monsterVector } = getNewMonsterVector(monster, player, time);
 
     const newMonsters = state.monsters.slice();
 
@@ -210,8 +210,8 @@ function animateMonster(state, time, player, monster, index) {
         ...monsterVector
     };
 
-    if (lost) {
-        return { ...state, lost: true };
+    if (ended) {
+        return { ...state, ended: "LOST" };
     }
 
     return { ...state, monsters: newMonsters };
