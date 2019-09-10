@@ -122,7 +122,7 @@ export default class Player extends Component {
 Player.propTypes = {
     animate: PropTypes.bool,
     gridSize: PropTypes.number.isRequired,
-    ended: PropTypes.string.isRequired,
+    ended: PropTypes.string,
     position: PropTypes.array.isRequired,
     direction: PropTypes.number.isRequired,
     onEnd: PropTypes.func

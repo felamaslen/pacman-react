@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EAST, NORTH, WEST, SOUTH } from './constants';
+import { EAST, NORTH, WEST, SOUTH, WON } from './constants';
 import getInitialState from './state';
 import { animate, changeDirection } from './game';
 import Board from './Board';
@@ -76,18 +76,18 @@ export default class Pacman extends Component {
         /**
          * Render null if user won, otherwise render food, monsters and player
          */
-        const foodComponent = this.state.ended ?
+        const foodAndMonsters = this.state.ended ?
             null :
-            <div>
-                <AllFood {...props} food={this.state.food} onEnd={() => this.setState({ ended: 'WON' })} />
+            <>
+                <AllFood {...props} food={this.state.food} onEnd={() => this.setState({ ended: WON })} />
                 {monsters}
-            </div>
+            </>
 
         return (
             <div className="pacman">
                 <Board {...props} />
                 <Scores score={this.state.score} ended={this.state.ended} />
-                {foodComponent}
+                {foodAndMonsters}
                 <Player {...props} {...this.state.player} ended={this.state.ended} onEnd={(state) => onEnd({ state, score: this.state.score })} />
             </div>
         );

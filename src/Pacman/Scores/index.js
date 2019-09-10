@@ -25,7 +25,7 @@ export default function Scores({ score, ended }) {
 }
 
 Scores.propTypes = {
-    ended: PropTypes.string.isRequired,
+    ended: PropTypes.string,
     score: PropTypes.number.isRequired
 };
 
