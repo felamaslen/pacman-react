@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/felamaslen/pacman-react.git"
+    "url": "git+https://github.com/nurra01/react-pacman.git"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/felamaslen/pacman-react/issues"
+    "url": "https://github.com/nurra01/react-pacman/issues"
   },
-  "homepage": "https://github.com/felamaslen/pacman-react#readme",
+  "homepage": "https://github.com/nurra01/react-pacman#readme",
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
