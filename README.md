@@ -1,6 +1,10 @@
-# pacman-react
+# react-pacman
 
 Pacman game written as a React component
+
+Original game repo: https://github.com/felamaslen/pacman-react
+
+This package contains some enhancements for the game
 
 ## Dependencies
 
@@ -18,15 +22,15 @@ Tests are written in the Mocha framework. To run them:
 
 ## Use as a dependency
 
-To use `pacman-react` as a dependency, run (in your project)
+To use `react-pacman` as a dependency, run (in your project)
 
-`npm install -S pacman-react`
+`npm install -S react-pacman`
 
 Then you can do something like the following:
 
 ```js
 import { render } from 'react-dom';
-import Pacman from 'pacman-react';
+import Pacman from 'react-pacman';
 
 render(<Pacman />, document.getElementById('root'));
 ```
