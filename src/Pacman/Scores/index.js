@@ -1,16 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { WON } from '../constants';
 import './style.scss';
 
-export default function Scores({ score, ended }) {
+export default function Scores({ score, lost }) {
     let gameOver = null;
 
-    if (ended) {
+    if (lost) {
         gameOver = (
-            <span className="game-over">
-                {ended === WON ? 'Congratulations, you won!' : 'Game over'}
-            </span>
+            <span className="game-over">{'Game over!'}</span>
         );
     }
 
@@ -25,7 +22,7 @@ export default function Scores({ score, ended }) {
 }
 
 Scores.propTypes = {
-    ended: PropTypes.string,
+    lost: PropTypes.bool.isRequired,
     score: PropTypes.number.isRequired
 };
 

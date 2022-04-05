@@ -76,13 +76,13 @@ export default class Player extends Component {
         }
 
         if (this.props.onEnd) {
-            setImmediate(() => this.props.onEnd(this.props.ended));
+            setImmediate(() => this.props.onEnd());
         }
 
         return null;
     }
     componentDidUpdate(prevProps) {
-        if (!prevProps.ended && this.props.ended) {
+        if (!prevProps.lost && this.props.lost) {
             clearInterval(this.state.timerBite);
             clearTimeout(this.state.timerLose);
 
@@ -90,7 +90,7 @@ export default class Player extends Component {
         }
     }
     render() {
-        const { gridSize, ended, position, direction } = this.props;
+        const { gridSize, lost, position, direction } = this.props;
 
         const pathProps = {
             stroke: 'none',
@@ -107,7 +107,7 @@ export default class Player extends Component {
             marginTop: -radius
         };
 
-        const offset = ended
+        const offset = lost
             ? 1
             : direction;
 
@@ -122,7 +122,7 @@ export default class Player extends Component {
 Player.propTypes = {
     animate: PropTypes.bool,
     gridSize: PropTypes.number.isRequired,
-    ended: PropTypes.string,
+    lost: PropTypes.bool.isRequired,
     position: PropTypes.array.isRequired,
     direction: PropTypes.number.isRequired,
     onEnd: PropTypes.func

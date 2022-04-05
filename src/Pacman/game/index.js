@@ -14,7 +14,7 @@ export function animate(state, { time = Date.now() } = {}) {
 
     const timeSeconds = (time - state.stepTime) / 1000;
 
-    if (state.ended) {
+    if (state.lost) {
         return state;
     }
 

@@ -4,7 +4,7 @@ Pacman game written as a React component
 
 Original game repo: https://github.com/felamaslen/pacman-react
 
-This package contains some enhancements for the game
+This package contains some dependency updates for the game
 
 ## Dependencies
 

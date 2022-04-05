@@ -59,7 +59,7 @@ export default function getInitialState() {
             nextDirection: EAST,
             lives: 3
         },
-        ended: null,
+        lost: false,
         monsters: [
             {
                 id: 'monster-red',

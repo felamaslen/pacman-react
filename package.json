@@ -1,6 +1,6 @@
 {
   "name": "react-pacman",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Pacman game written as a React component",
   "main": "index.js",
   "scripts": {
@@ -36,7 +36,6 @@
     "eslint-plugin-react": "^7.8.2",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
-    "node-sass": "^4.12.0",
     "react-hot-loader": "^4.2.0",
     "sass-loader": "^7.0.1",
     "style-loader": "^0.21.0",
